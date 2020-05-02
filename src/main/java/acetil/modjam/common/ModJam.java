@@ -38,6 +38,7 @@ public class ModJam {
 
         // Register ourselves for server and other game events we are interested in
         MinecraftForge.EVENT_BUS.register(this);
+        registerDefferedRegisters();
     }
 
     private void setup (final FMLCommonSetupEvent event) {
@@ -57,8 +58,10 @@ public class ModJam {
     }
     private void registerDefferedRegisters () {
         ModBlocks.BLOCKS.register(FMLJavaModLoadingContext.get().getModEventBus());
-        
+
         ModBlocks.ITEMS.register(FMLJavaModLoadingContext.get().getModEventBus());
         ModItems.ITEMS.register(FMLJavaModLoadingContext.get().getModEventBus());
+
+        ModBlocks.TILE_ENTITIES.register(FMLJavaModLoadingContext.get().getModEventBus());
     }
 }
