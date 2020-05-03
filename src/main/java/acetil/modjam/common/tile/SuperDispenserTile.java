@@ -16,7 +16,7 @@ import javax.annotation.Nullable;
 
 public class SuperDispenserTile extends TileEntity {
     private ItemStackHandler itemHandler;
-    private LazyOptional<IItemHandler> itemOptional = LazyOptional.empty();
+    private LazyOptional<IItemHandler> itemOptional;
     private static final int NUM_SLOTS = 9;
     public SuperDispenserTile () {
         super(ModBlocks.SUPER_DISPENSER_TILE.get());
@@ -53,5 +53,9 @@ public class SuperDispenserTile extends TileEntity {
     public CompoundNBT write (@Nonnull CompoundNBT compound) {
         compound.put("items", itemHandler.serializeNBT());
         return super.write(compound);
+    }
+
+    public void dispense (Direction direction) {
+        System.out.println("Dispense in direction: " + direction.getName());
     }
 }
