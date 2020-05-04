@@ -1,20 +1,21 @@
 package acetil.modjam.common.tile;
 
-import acetil.modjam.common.util.TriFunction;
+import acetil.modjam.common.util.QuadFunction;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
 public class SuperDispenserBehaviour {
-    private static List<Behaviour> initialBehaviours;
-    private static List<Behaviour> effectBehaviours;
+    private static List<Behaviour> initialBehaviours = new ArrayList<>();
+    private static List<Behaviour> effectBehaviours = new ArrayList<>();
     public static void registerInitial (Predicate<ItemStack> itemPredicate, Function<ItemStack, ItemStack> stackFunction,
-                                 TriFunction<World, BlockPos, Direction, Boolean> behaviour) {
+                                 QuadFunction<ItemStack, World, BlockPos, Direction, Boolean> behaviour) {
         // for what happens when the item is dispensed
         // itemstack function is what happens TO THE SLOT, and triggers only when behaviour returns true
         // effects are added in order of increasing priority
@@ -23,7 +24,7 @@ public class SuperDispenserBehaviour {
     };
 
     public static void registerEffect (Predicate<ItemStack> itemPredicate, Function<ItemStack, ItemStack> stackFunction,
-                                             TriFunction<World, BlockPos, Direction, Boolean> behaviour) {
+                                             QuadFunction<ItemStack, World, BlockPos, Direction, Boolean> behaviour) {
         // for what happens after the dispensed entity contacts a block
         // importantly, unlike initial itemstack function, this one is what happens to the dropped itemstack
         effectBehaviours.add(0, new Behaviour(itemPredicate, stackFunction, behaviour));
@@ -32,7 +33,7 @@ public class SuperDispenserBehaviour {
         ItemStack resultStack = stack;
         for (Behaviour b : initialBehaviours) {
             if (b.itemPredicate.test(stack)) {
-                boolean result = b.behaviour.apply(world, pos, direction);
+                boolean result = b.behaviour.apply(stack, world, pos, direction);
                 if (result) {
                     resultStack = b.stackFunction.apply(stack);
                 }
@@ -47,7 +48,7 @@ public class SuperDispenserBehaviour {
         ItemStack resultStack = stack;
         for (Behaviour b : effectBehaviours) {
             if (b.itemPredicate.test(stack)) {
-                if (b.behaviour.apply(world, pos, direction)) {
+                if (b.behaviour.apply(stack, world, pos, direction)) {
                     resultStack = b.stackFunction.apply(stack);
                     break;
                 }
@@ -57,14 +58,14 @@ public class SuperDispenserBehaviour {
     }
     private static class Behaviour {
         public Behaviour (Predicate<ItemStack> itemPredicate, Function<ItemStack, ItemStack> stackFunction,
-                          TriFunction<World, BlockPos, Direction, Boolean> behaviour) {
+                          QuadFunction<ItemStack, World, BlockPos, Direction, Boolean> behaviour) {
             this.itemPredicate = itemPredicate;
             this.stackFunction = stackFunction;
             this.behaviour = behaviour;
         }
         public Predicate<ItemStack> itemPredicate;
         public Function<ItemStack, ItemStack> stackFunction;
-        public TriFunction<World, BlockPos, Direction, Boolean> behaviour;
+        public QuadFunction<ItemStack, World, BlockPos, Direction, Boolean> behaviour;
     }
 
 }

@@ -1,6 +1,7 @@
 package acetil.modjam.common.tile;
 
 import acetil.modjam.common.block.ModBlocks;
+import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.tileentity.TileEntityType;
@@ -18,6 +19,7 @@ public class SuperDispenserTile extends TileEntity {
     private ItemStackHandler itemHandler;
     private LazyOptional<IItemHandler> itemOptional;
     private static final int NUM_SLOTS = 9;
+    private boolean doContinue = true;
     public SuperDispenserTile () {
         super(ModBlocks.SUPER_DISPENSER_TILE.get());
 
@@ -54,8 +56,15 @@ public class SuperDispenserTile extends TileEntity {
         compound.put("items", itemHandler.serializeNBT());
         return super.write(compound);
     }
+    private int getDispenseSlot () {
+        return 0; // TODO
+    }
 
     public void dispense (Direction direction) {
         System.out.println("Dispense in direction: " + direction.getName());
+        int slot = getDispenseSlot();
+        itemHandler.setStackInSlot(slot,
+                SuperDispenserBehaviour.evaluateInitial(itemHandler.getStackInSlot(slot), world, getPos(), direction, doContinue));
     }
+
 }

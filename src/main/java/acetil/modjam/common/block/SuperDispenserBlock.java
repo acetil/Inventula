@@ -67,7 +67,7 @@ public class SuperDispenserBlock extends Block {
         super.neighborChanged(state, worldIn, pos, blockIn, fromPos, isMoving);
         if (worldIn.isBlockPowered(pos) && !state.get(POWERED)) {
             worldIn.setBlockState(pos, state.with(POWERED, true));
-            if (worldIn.getTileEntity(pos) != null && worldIn.getTileEntity(pos) instanceof SuperDispenserTile) {
+            if (worldIn.getTileEntity(pos) != null && worldIn.getTileEntity(pos) instanceof SuperDispenserTile && !worldIn.isRemote) {
                 ((SuperDispenserTile) worldIn.getTileEntity(pos)).dispense(state.get(FACING));
             }
         } else if (!worldIn.isBlockPowered(pos) && state.get(POWERED)) {
