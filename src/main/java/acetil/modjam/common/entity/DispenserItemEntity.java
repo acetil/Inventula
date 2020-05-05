@@ -20,6 +20,8 @@ import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 import org.apache.logging.log4j.Level;
 
 public class DispenserItemEntity extends ProjectileItemEntity {
@@ -40,15 +42,12 @@ public class DispenserItemEntity extends ProjectileItemEntity {
         return this;
     }
     public DispenserItemEntity setItemStack (ItemStack stack) {
-        setItemStackPrivate(stack);
+        setItem(stack);
         return this;
     }
-    private void setItemStackPrivate (ItemStack stack) {
-        this.getDataManager().set(ITEMSTACK_DATA, stack);
-    }
     @Override
-    public void func_213884_b (ItemStack stack) {
-        setItemStackPrivate(stack);
+    public void setItem(ItemStack stack) {
+        this.getDataManager().set(ITEMSTACK_DATA, stack);
     }
 
     public DispenserItemEntity setDispenserPos (BlockPos pos) {
@@ -58,7 +57,7 @@ public class DispenserItemEntity extends ProjectileItemEntity {
 
 
     @Override
-    protected Item func_213885_i () {
+    protected Item getDefaultItem () {
         return this.getDataManager().get(ITEMSTACK_DATA).getItem();
     }
 
@@ -108,5 +107,12 @@ public class DispenserItemEntity extends ProjectileItemEntity {
         super.readAdditional(compound);
         CompoundNBT posNBT = compound.getCompound("dispenser_pos");
         this.getDataManager().set(DISPENSER_POS, new BlockPos(posNBT.getInt("x"), posNBT.getInt("y"), posNBT.getInt("z")));
+    }
+
+    @OnlyIn(Dist.CLIENT)
+    @Override
+    public ItemStack getItem () {
+        ModJam.LOGGER.log(Level.DEBUG, "Getting item!");
+        return super.getItem();
     }
 }
