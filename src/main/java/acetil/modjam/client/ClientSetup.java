@@ -1,0 +1,15 @@
+package acetil.modjam.client;
+
+import acetil.modjam.client.renderer.DispenserItemRenderer;
+import acetil.modjam.common.entity.ModEntities;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.entity.EntityRendererManager;
+import net.minecraftforge.fml.client.registry.RenderingRegistry;
+import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
+
+public class ClientSetup {
+    public static void setup (final FMLClientSetupEvent event) {
+        RenderingRegistry.registerEntityRenderingHandler(ModEntities.DISPENSER_ITEM_ENTITY.get(),
+                (EntityRendererManager manager) -> new DispenserItemRenderer(manager, Minecraft.getInstance().getItemRenderer()));
+    }
+}

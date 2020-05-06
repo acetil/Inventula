@@ -2,7 +2,9 @@ package acetil.modjam.common.tile;
 
 import acetil.modjam.common.ModJam;
 import acetil.modjam.common.entity.DispenserItemEntity;
+import acetil.modjam.common.entity.ModEntities;
 import acetil.modjam.common.util.QuadFunction;
+import net.minecraft.entity.SpawnReason;
 import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Direction;

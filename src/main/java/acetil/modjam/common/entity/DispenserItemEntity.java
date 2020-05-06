@@ -1,6 +1,8 @@
 package acetil.modjam.common.entity;
 
 import acetil.modjam.common.ModJam;
+import acetil.modjam.common.network.DispenserEntitySpawnMessage;
+import acetil.modjam.common.network.PacketHandler;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
@@ -22,6 +24,7 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraftforge.fml.network.NetworkDirection;
 import org.apache.logging.log4j.Level;
 
 public class DispenserItemEntity extends ProjectileItemEntity {
@@ -55,7 +58,13 @@ public class DispenserItemEntity extends ProjectileItemEntity {
         return this;
     }
 
-
+    public DispenserItemEntity setPosition (Vec3d pos) {
+        setPosition(pos.x, pos.y, pos.z);
+        return this;
+    }
+    public BlockPos getDispenserPos () {
+        return getDataManager().get(DISPENSER_POS);
+    }
     @Override
     protected Item getDefaultItem () {
         return this.getDataManager().get(ITEMSTACK_DATA).getItem();
@@ -109,10 +118,8 @@ public class DispenserItemEntity extends ProjectileItemEntity {
         this.getDataManager().set(DISPENSER_POS, new BlockPos(posNBT.getInt("x"), posNBT.getInt("y"), posNBT.getInt("z")));
     }
 
-    @OnlyIn(Dist.CLIENT)
     @Override
-    public ItemStack getItem () {
-        ModJam.LOGGER.log(Level.DEBUG, "Getting item!");
-        return super.getItem();
+    public IPacket<?> createSpawnPacket () {
+        return PacketHandler.INSTANCE.toVanillaPacket(new DispenserEntitySpawnMessage(this), NetworkDirection.PLAY_TO_CLIENT);
     }
 }

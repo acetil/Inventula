@@ -1,10 +1,14 @@
 package acetil.modjam.common;
 
+import acetil.modjam.client.ClientSetup;
 import acetil.modjam.common.block.ModBlocks;
 import acetil.modjam.common.constants.Constants;
 import acetil.modjam.common.entity.ModEntities;
 import acetil.modjam.common.item.ModItems;
+import acetil.modjam.common.network.PacketHandler;
 import acetil.modjam.common.tile.DefaultSuperDispenserBehaviour;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
@@ -37,10 +41,10 @@ public class ModJam {
 
     private void setup (final FMLCommonSetupEvent event) {
         DefaultSuperDispenserBehaviour.addDefaultInitialBehaviours();
+        PacketHandler.registerMessages();
     }
-
     private void clientSetup (final FMLClientSetupEvent event) {
-
+        ClientSetup.setup(event);
     }
 
     private void enqueueIMC (final InterModEnqueueEvent event) {
