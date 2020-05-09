@@ -1,8 +1,7 @@
 package acetil.modjam.common.network;
 
 import acetil.modjam.common.ModJam;
-import acetil.modjam.common.entity.DispenserItemEntity;
-import acetil.modjam.common.entity.ModEntities;
+import acetil.modjam.common.particle.DispenserItemParticleData;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.item.ItemStack;
@@ -25,38 +24,48 @@ public class DispenserEntitySpawnMessage {
     Vec3d initialVel;
     UUID uuid;
     int entityId;
-    public DispenserEntitySpawnMessage (DispenserItemEntity entity) {
-        spawnPos = entity.getPositionVec();
-        initialVel = entity.getMotion();
-        entityId = entity.getEntityId();
-        uuid = entity.getUniqueID();
-    };
+    ItemStack stack;
+    int lifetime;
+    public DispenserEntitySpawnMessage (ItemStack stack, Vec3d spawnPos, Vec3d initialVel, int lifetime) {
+        this.stack = stack;
+        this.spawnPos = spawnPos;
+        this.initialVel = initialVel;
+        this.lifetime = lifetime;
+    }
     public DispenserEntitySpawnMessage (PacketBuffer buf) {
+        stack = buf.readItemStack();
         spawnPos = new Vec3d(buf.readDouble(), buf.readDouble(), buf.readDouble());
         initialVel = new Vec3d(buf.readDouble(), buf.readDouble(), buf.readDouble());
-        entityId = buf.readInt();
-        uuid = buf.readUniqueId();
+        lifetime = buf.readInt();
+        //entityId = buf.readInt();
+        //uuid = buf.readUniqueId();
     }
     public void writePacket (PacketBuffer buf) {
+        buf.writeItemStack(stack);
         buf.writeDouble(spawnPos.getX());
         buf.writeDouble(spawnPos.getY());
         buf.writeDouble(spawnPos.getZ());
         buf.writeDouble(initialVel.getX());
         buf.writeDouble(initialVel.getY());
         buf.writeDouble(initialVel.getZ());
-        buf.writeInt(entityId);
-        buf.writeUniqueId(uuid);
+        buf.writeInt(lifetime);
+        //buf.writeInt(entityId);
+        //buf.writeUniqueId(uuid);
     }
     public void handlePacket (Supplier<NetworkEvent.Context> ctx) {
-        ModJam.LOGGER.log(Level.DEBUG, "Handling spawn packet!");
+        ModJam.LOGGER.log(Level.DEBUG, "Handling spawn packet at {}!", System.currentTimeMillis());
         ctx.get().enqueueWork(() -> {
            ClientWorld world = Minecraft.getInstance().world;
-           DispenserItemEntity entity = new DispenserItemEntity(ModEntities.DISPENSER_ITEM_ENTITY.get(), world)
-                   .setVelocityCustom(initialVel);
+           /*DispenserItemEntity entity = new DispenserItemEntity(ModEntities.DISPENSER_ITEM_ENTITY.get(), world);
+           entity.setMotion(initialVel);
            entity.setPacketCoordinates(spawnPos.getX(), spawnPos.getY(), spawnPos.getZ());
            entity.setEntityId(entityId);
            entity.setUniqueId(uuid);
-           world.addEntity(entityId, entity);
+           world.addEntity(entityId, entity);*/
+            world.addParticle(new DispenserItemParticleData(stack, lifetime), true, spawnPos.getX(), spawnPos.getY(), spawnPos.getZ(),
+                    initialVel.getX(), initialVel.getY(), initialVel.getZ());
+           ModJam.LOGGER.log(Level.DEBUG, "Spawning particle at {}. Pos: ({}, {}, {})", System.currentTimeMillis(), spawnPos.getX(), spawnPos.getY(), spawnPos.getZ());
+
         });
         ctx.get().setPacketHandled(true);
     }

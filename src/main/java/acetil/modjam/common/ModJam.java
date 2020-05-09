@@ -3,9 +3,9 @@ package acetil.modjam.common;
 import acetil.modjam.client.ClientSetup;
 import acetil.modjam.common.block.ModBlocks;
 import acetil.modjam.common.constants.Constants;
-import acetil.modjam.common.entity.ModEntities;
 import acetil.modjam.common.item.ModItems;
 import acetil.modjam.common.network.PacketHandler;
+import acetil.modjam.common.particle.ModParticles;
 import acetil.modjam.common.tile.DefaultSuperDispenserBehaviour;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
@@ -33,7 +33,7 @@ public class ModJam {
         FMLJavaModLoadingContext.get().getModEventBus().addListener(this::processIMC);
         // Register the doClientStuff method for modloading
         FMLJavaModLoadingContext.get().getModEventBus().addListener(this::clientSetup);
-
+        FMLJavaModLoadingContext.get().getModEventBus().addListener(ClientSetup::registerParticleFactories);
         // Register ourselves for server and other game events we are interested in
         MinecraftForge.EVENT_BUS.register(this);
         registerDefferedRegisters();
@@ -62,6 +62,6 @@ public class ModJam {
 
         ModBlocks.TILE_ENTITIES.register(FMLJavaModLoadingContext.get().getModEventBus());
 
-        ModEntities.ENTITIES.register(FMLJavaModLoadingContext.get().getModEventBus());
+        ModParticles.PARTICLES.register(FMLJavaModLoadingContext.get().getModEventBus());
     }
 }
