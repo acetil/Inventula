@@ -1,6 +1,7 @@
 package acetil.modjam.common.tile;
 
 import acetil.modjam.common.ModJam;
+import acetil.modjam.common.entity.DispenserItemEntity;
 import acetil.modjam.common.network.DispenserEntitySpawnMessage;
 import acetil.modjam.common.network.PacketHandler;
 import acetil.modjam.common.particle.DispenserItemParticleData;
@@ -38,8 +39,10 @@ public class DefaultSuperDispenserBehaviour {
                 Vec3i vec1 = d.getDirectionVec();
                 Vec3d velVec = new Vec3d(vec1).scale(DISPENSER_ENTITY_VELOCITY);
                 Vec3d offVec = getOffsetSpawnVec(pos, d);
-                PacketHandler.INSTANCE.send(PacketDistributor.TRACKING_CHUNK.with(() -> world.getChunkAt(pos)),
-                        new DispenserEntitySpawnMessage(stack.copy().split(1), offVec, velVec, 10));
+                /*PacketHandler.INSTANCE.send(PacketDistributor.TRACKING_CHUNK.with(() -> world.getChunkAt(pos)),
+                        new DispenserEntitySpawnMessage(stack.copy().split(1), offVec, velVec, 10));*/
+                world.addEntity(new DispenserItemEntity(world, offVec).setVelocityCustom(velVec)
+                        .setItemStack(stack.copy().split(1)).setDispenserPos(pos));
                 return true;
             };
     public static void addDefaultInitialBehaviours () {

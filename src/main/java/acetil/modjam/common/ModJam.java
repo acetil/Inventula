@@ -3,6 +3,7 @@ package acetil.modjam.common;
 import acetil.modjam.client.ClientSetup;
 import acetil.modjam.common.block.ModBlocks;
 import acetil.modjam.common.constants.Constants;
+import acetil.modjam.common.entity.ModEntities;
 import acetil.modjam.common.item.ModItems;
 import acetil.modjam.common.network.PacketHandler;
 import acetil.modjam.common.particle.ModParticles;
@@ -61,6 +62,8 @@ public class ModJam {
         ModItems.ITEMS.register(FMLJavaModLoadingContext.get().getModEventBus());
 
         ModBlocks.TILE_ENTITIES.register(FMLJavaModLoadingContext.get().getModEventBus());
+
+        ModEntities.ENTITIES.register(FMLJavaModLoadingContext.get().getModEventBus());
 
         ModParticles.PARTICLES.register(FMLJavaModLoadingContext.get().getModEventBus());
     }
