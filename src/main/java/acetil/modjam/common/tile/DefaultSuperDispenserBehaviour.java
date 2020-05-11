@@ -88,6 +88,16 @@ public class DefaultSuperDispenserBehaviour {
             ActionResultType result = item.tryPlace(new CustomItemUseContext(world, stack, pos, d));
             return result.isSuccessOrConsume();
         });
+        SuperDispenserBehaviour.registerEffect(MATCH_NOT_EMPTY, DEGRADE, (ItemStack stack, World world, BlockPos pos, Direction d) -> {
+            BlockState state = world.getBlockState(pos);
+            if (stack.getItem().getToolTypes(stack).contains(state.getHarvestTool()) && stack.canHarvestBlock(state)) {
+                Block.spawnDrops(state, world, pos, null, null, stack);
+                world.setBlockState(pos, Blocks.AIR.getDefaultState());
+                return true;
+            } else {
+                return false;
+            }
+        });
     }
     private static Vec3d getOffsetSpawnVec (BlockPos pos, Direction d) {
         Vec3i vec1 = d.getDirectionVec();
