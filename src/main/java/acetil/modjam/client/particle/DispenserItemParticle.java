@@ -1,5 +1,6 @@
 package acetil.modjam.client.particle;
 
+import acetil.modjam.client.WorldParticleTracker;
 import acetil.modjam.common.particle.DispenserItemParticleData;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.vertex.IVertexBuilder;
@@ -23,6 +24,7 @@ public class DispenserItemParticle extends Particle {
     private static final Vec3d ACC_VEC = new Vec3d(0, -1 * GRAVITY_ACCELERATION, 0);
     private Vec3d velVec;
     private Vec3d posVec;
+    private int entityId;
     public DispenserItemParticle (DispenserItemParticleData data, World worldIn, double posX, double posY,
                                   double posZ, double velX, double velY, double velZ) {
         super(worldIn, posX, posY, posZ);
@@ -32,6 +34,11 @@ public class DispenserItemParticle extends Particle {
         this.itemRenderer = Minecraft.getInstance().getItemRenderer();
         this.setMaxAge(data.getLifetime());
         System.out.println("Making particle!");
+        entityId = data.getEntityId();
+        WorldParticleTracker.addParticle(this);
+    }
+    public int getEntityId () {
+        return entityId;
     }
     @Override
     public void renderParticle (IVertexBuilder buffer, ActiveRenderInfo renderInfo, float partialTicks) {

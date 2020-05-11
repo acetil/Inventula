@@ -14,9 +14,14 @@ import net.minecraft.particles.ParticleType;
 public class DispenserItemParticleData implements IParticleData {
     private ItemStack stack;
     private int lifetime;
+    private int entityId = -1;
     public DispenserItemParticleData (ItemStack stack, int lifetime) {
         this.stack = stack;
         this.lifetime = lifetime;
+    }
+    public DispenserItemParticleData (ItemStack stack, int lifetime, int entityId) {
+        this(stack, lifetime);
+        this.entityId = entityId;
     }
     public static final IParticleData.IDeserializer<DispenserItemParticleData> DESERIALIZER = new IDeserializer<DispenserItemParticleData>() {
         @Override
@@ -40,6 +45,9 @@ public class DispenserItemParticleData implements IParticleData {
     public int getLifetime () {
         return lifetime;
     }
+    public int getEntityId () {
+        return entityId;
+    }
     @Override
     public ParticleType<?> getType () {
         return ModParticles.ITEM_PARTICLE.get();
@@ -49,6 +57,7 @@ public class DispenserItemParticleData implements IParticleData {
     public void write (PacketBuffer buffer) {
         buffer.writeItemStack(stack);
         buffer.writeInt(lifetime);
+        buffer.writeInt(entityId);
     }
 
     @Override

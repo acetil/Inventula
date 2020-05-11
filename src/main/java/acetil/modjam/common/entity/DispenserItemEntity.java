@@ -2,6 +2,7 @@ package acetil.modjam.common.entity;
 
 import acetil.modjam.common.ModJam;
 import acetil.modjam.common.network.DispenserEntitySpawnMessage;
+import acetil.modjam.common.network.DispenserParticleRemoveMessage;
 import acetil.modjam.common.network.PacketHandler;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.Entity;
@@ -25,6 +26,7 @@ import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.fml.network.NetworkDirection;
+import net.minecraftforge.fml.network.PacketDistributor;
 import org.apache.logging.log4j.Level;
 
 public class DispenserItemEntity extends ProjectileItemEntity {
@@ -101,6 +103,8 @@ public class DispenserItemEntity extends ProjectileItemEntity {
     private void killEntity (ItemStack stack) {
         world.addEntity(new ItemEntity(world, this.lastTickPosX, this.lastTickPosY, this.lastTickPosZ,
                 stack));
+        PacketHandler.INSTANCE.send(PacketDistributor.TRACKING_CHUNK.with(() -> world.getChunkAt(getPosition())),
+                new DispenserParticleRemoveMessage(getEntityId()));
         this.remove();
     }
 
@@ -125,6 +129,7 @@ public class DispenserItemEntity extends ProjectileItemEntity {
     @Override
     public IPacket<?> createSpawnPacket () {
         return PacketHandler.INSTANCE.toVanillaPacket(new DispenserEntitySpawnMessage(this.getDataManager().get(ITEMSTACK_DATA),
-                initialPos, initialVel, 10), NetworkDirection.PLAY_TO_CLIENT);
+                initialPos, initialVel, 10, getEntityId()), NetworkDirection.PLAY_TO_CLIENT);
     }
+
 }

@@ -1,5 +1,6 @@
 package acetil.modjam.common;
 
+import acetil.modjam.client.ClientEvents;
 import acetil.modjam.client.ClientSetup;
 import acetil.modjam.common.block.ModBlocks;
 import acetil.modjam.common.constants.Constants;
@@ -34,7 +35,8 @@ public class ModJam {
         FMLJavaModLoadingContext.get().getModEventBus().addListener(this::processIMC);
         // Register the doClientStuff method for modloading
         FMLJavaModLoadingContext.get().getModEventBus().addListener(this::clientSetup);
-        FMLJavaModLoadingContext.get().getModEventBus().addListener(ClientSetup::registerParticleFactories);
+        ClientEvents.registerEvents(FMLJavaModLoadingContext.get().getModEventBus());
+        FMLJavaModLoadingContext.get().getModEventBus().addListener(ClientEvents::attachCapabilities);
         // Register ourselves for server and other game events we are interested in
         MinecraftForge.EVENT_BUS.register(this);
         registerDefferedRegisters();

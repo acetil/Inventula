@@ -15,6 +15,7 @@ public class ClientSetup {
     public static void setup (final FMLClientSetupEvent event) {
         RenderingRegistry.registerEntityRenderingHandler(ModEntities.DISPENSER_ITEM_ENTITY.get(), (EntityRendererManager m) ->
                 new DispenserItemRenderer(m, Minecraft.getInstance().getItemRenderer()));
+        //CapabilityParticleTracker.register();
     }
     public static void registerParticleFactories (final ParticleFactoryRegisterEvent event) {
         Minecraft.getInstance().particles.registerFactory(ModParticles.ITEM_PARTICLE.get(), DispenserItemParticle::new);

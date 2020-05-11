@@ -13,6 +13,8 @@ public class PacketHandler {
     public static void registerMessages () {
         INSTANCE.registerMessage(id++, DispenserEntitySpawnMessage.class, DispenserEntitySpawnMessage::writePacket,
                 DispenserEntitySpawnMessage::new, DispenserEntitySpawnMessage::handlePacket);
+        INSTANCE.registerMessage(id++, DispenserParticleRemoveMessage.class, DispenserParticleRemoveMessage::writePacket,
+                DispenserParticleRemoveMessage::new, DispenserParticleRemoveMessage::handlePacket);
 
     }
 }

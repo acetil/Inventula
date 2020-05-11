@@ -23,7 +23,7 @@ public class DispenserEntitySpawnMessage {
     Vec3d spawnPos;
     Vec3d initialVel;
     UUID uuid;
-    int entityId;
+    int entityId = -1;
     ItemStack stack;
     int lifetime;
     public DispenserEntitySpawnMessage (ItemStack stack, Vec3d spawnPos, Vec3d initialVel, int lifetime) {
@@ -32,11 +32,16 @@ public class DispenserEntitySpawnMessage {
         this.initialVel = initialVel;
         this.lifetime = lifetime;
     }
+    public DispenserEntitySpawnMessage (ItemStack stack, Vec3d spawnPos, Vec3d initialVel, int lifetime, int entityId) {
+        this(stack, spawnPos, initialVel, lifetime);
+        this.entityId = entityId;
+    }
     public DispenserEntitySpawnMessage (PacketBuffer buf) {
         stack = buf.readItemStack();
         spawnPos = new Vec3d(buf.readDouble(), buf.readDouble(), buf.readDouble());
         initialVel = new Vec3d(buf.readDouble(), buf.readDouble(), buf.readDouble());
         lifetime = buf.readInt();
+        entityId = buf.readInt();
         //entityId = buf.readInt();
         //uuid = buf.readUniqueId();
     }
@@ -49,6 +54,7 @@ public class DispenserEntitySpawnMessage {
         buf.writeDouble(initialVel.getY());
         buf.writeDouble(initialVel.getZ());
         buf.writeInt(lifetime);
+        buf.writeInt(entityId);
         //buf.writeInt(entityId);
         //buf.writeUniqueId(uuid);
     }
@@ -62,7 +68,7 @@ public class DispenserEntitySpawnMessage {
            entity.setEntityId(entityId);
            entity.setUniqueId(uuid);
            world.addEntity(entityId, entity);*/
-            world.addParticle(new DispenserItemParticleData(stack, lifetime), true, spawnPos.getX(), spawnPos.getY(), spawnPos.getZ(),
+            world.addParticle(new DispenserItemParticleData(stack, lifetime, entityId), true, spawnPos.getX(), spawnPos.getY(), spawnPos.getZ(),
                     initialVel.getX(), initialVel.getY(), initialVel.getZ());
            ModJam.LOGGER.log(Level.DEBUG, "Spawning particle at {}. Pos: ({}, {}, {})", System.currentTimeMillis(), spawnPos.getX(), spawnPos.getY(), spawnPos.getZ());
 
