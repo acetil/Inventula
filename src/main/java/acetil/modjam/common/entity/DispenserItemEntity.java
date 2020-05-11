@@ -4,6 +4,7 @@ import acetil.modjam.common.ModJam;
 import acetil.modjam.common.network.DispenserEntitySpawnMessage;
 import acetil.modjam.common.network.DispenserParticleRemoveMessage;
 import acetil.modjam.common.network.PacketHandler;
+import acetil.modjam.common.tile.SuperDispenserBehaviour;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
@@ -93,10 +94,10 @@ public class DispenserItemEntity extends ProjectileItemEntity {
             ItemStack stack = this.getDataManager().get(ITEMSTACK_DATA);
             ModJam.LOGGER.log(Level.DEBUG, "Dispenser Entity hit block at ({}, {}, {}) on face {}",
                     pos.getX(), pos.getY(), pos.getZ(), d.getName());
-            killEntity(stack);
+            killEntity(SuperDispenserBehaviour.evaluateEffect(stack, world, pos, d));
         } else if (result.getType() == RayTraceResult.Type.ENTITY) {
             // TODO
-            ItemStack stack =this.getDataManager().get(ITEMSTACK_DATA);
+            ItemStack stack = this.getDataManager().get(ITEMSTACK_DATA);
             killEntity(stack);
         }
     }
