@@ -6,6 +6,7 @@ import acetil.modjam.common.network.DispenserEntitySpawnMessage;
 import acetil.modjam.common.network.PacketHandler;
 import acetil.modjam.common.particle.DispenserItemParticleData;
 import acetil.modjam.common.util.QuadFunction;
+import com.mojang.authlib.GameProfile;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
@@ -83,6 +84,7 @@ public class DefaultSuperDispenserBehaviour {
         });
         SuperDispenserBehaviour.registerInitial(MATCH_NOT_EMPTY, ITEM_STACK_SHRINK, SPAWN_DISPENSER_ENTITY);
     }
+    @SuppressWarnings("deprecation")
     public static void addDefaultEffectBehaviours () {
         ModJam.LOGGER.log(Level.INFO, "Adding default effect dispenser behaviours!");
         SuperDispenserBehaviour.registerEffect((ItemStack stack) -> stack.getItem() instanceof BlockItem, DESTROY,
@@ -149,6 +151,9 @@ public class DefaultSuperDispenserBehaviour {
             }
             return false;
         });
+        SuperDispenserBehaviour.registerEffect((ItemStack stack) -> stack.getItem() instanceof BoneMealItem, DESTROY,
+                (ItemStack stack, World world, BlockPos pos, Direction d) -> BoneMealItem.applyBonemeal(stack.copy(), world, pos));
+
     }
     private static Vec3d getOffsetSpawnVec (BlockPos pos, Direction d) {
         Vec3i vec1 = d.getDirectionVec();
