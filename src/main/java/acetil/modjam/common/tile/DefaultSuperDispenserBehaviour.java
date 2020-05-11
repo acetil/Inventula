@@ -24,6 +24,7 @@ import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.World;
 import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.common.util.LazyOptional;
+import net.minecraftforge.event.ForgeEventFactory;
 import net.minecraftforge.fml.network.PacketDistributor;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
@@ -89,7 +90,7 @@ public class DefaultSuperDispenserBehaviour {
             ModJam.LOGGER.log(Level.DEBUG, "Attempting to add block!");
             BlockPos newPos = pos.add(d.getDirectionVec());
             BlockItem item = (BlockItem) stack.getItem();
-            ActionResultType result = item.tryPlace(new CustomItemUseContext(world, stack, pos, d));
+            ActionResultType result = item.tryPlace(new CustomBlockItemUseContext(world, stack, pos, d));
             return result.isSuccessOrConsume();
         });
         SuperDispenserBehaviour.registerEffect(MATCH_NOT_EMPTY, DEGRADE, (ItemStack stack, World world, BlockPos pos, Direction d) -> {
@@ -101,6 +102,21 @@ public class DefaultSuperDispenserBehaviour {
             } else {
                 return false;
             }
+        });
+        SuperDispenserBehaviour.registerEffect((ItemStack stack) -> stack.getItem() instanceof HoeItem, DEGRADE,
+                (ItemStack stack, World world, BlockPos pos, Direction d) -> {
+            int hook = ForgeEventFactory.onHoeUse(new CustomBlockItemUseContext(world, stack, pos, d));
+            if (hook != 0) {
+                return hook > 0;
+            }
+            if (d != Direction.DOWN && world.isAirBlock(pos.up())) {
+                BlockState state = HoeItem.HOE_LOOKUP.get(world.getBlockState(pos).getBlock());
+                if (state != null) {
+                    world.setBlockState(pos, state);
+                    return true;
+                }
+            }
+            return false;
         });
         SuperDispenserBehaviour.registerEffect(MATCH_NOT_EMPTY, DESTROY, (ItemStack stack, World world, BlockPos pos, Direction d) -> {
             TileEntity te = world.getTileEntity(pos);
@@ -140,12 +156,12 @@ public class DefaultSuperDispenserBehaviour {
                 pos.getY() + POSITION_OFFSET + vec1.getY() * DIRECTION_MULT,
                 pos.getZ() + POSITION_OFFSET + vec1.getZ() * DIRECTION_MULT);
     }
-    private static class CustomItemUseContext extends BlockItemUseContext {
+    private static class CustomBlockItemUseContext extends BlockItemUseContext {
         // NEVER use the hitVec, it isn't accurate!
-        public CustomItemUseContext (World worldIn, @Nullable PlayerEntity player, Hand handIn, ItemStack heldItem, BlockRayTraceResult rayTraceResultIn) {
+        public CustomBlockItemUseContext (World worldIn, @Nullable PlayerEntity player, Hand handIn, ItemStack heldItem, BlockRayTraceResult rayTraceResultIn) {
             super(worldIn, player, handIn, heldItem, rayTraceResultIn);
         }
-        public CustomItemUseContext (World world, ItemStack stack, BlockPos pos, Direction d) {
+        public CustomBlockItemUseContext (World world, ItemStack stack, BlockPos pos, Direction d) {
             this(world, null, Hand.MAIN_HAND, stack, new BlockRayTraceResult(new Vec3d(0, 0, 0), d, pos, false));
         }
 
