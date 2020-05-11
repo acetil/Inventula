@@ -13,6 +13,7 @@ import net.minecraft.entity.SpawnReason;
 import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.*;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Direction;
 import net.minecraft.util.Hand;
@@ -22,7 +23,10 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.World;
 import net.minecraft.world.server.ServerWorld;
+import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.fml.network.PacketDistributor;
+import net.minecraftforge.items.CapabilityItemHandler;
+import net.minecraftforge.items.IItemHandler;
 import org.apache.logging.log4j.Level;
 
 import javax.annotation.Nullable;
@@ -97,6 +101,37 @@ public class DefaultSuperDispenserBehaviour {
             } else {
                 return false;
             }
+        });
+        SuperDispenserBehaviour.registerEffect(MATCH_NOT_EMPTY, DESTROY, (ItemStack stack, World world, BlockPos pos, Direction d) -> {
+            TileEntity te = world.getTileEntity(pos);
+            if (te == null) {
+                return false;
+            }
+            LazyOptional<IItemHandler> itemHandlerOptional = te.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, d);
+            if (itemHandlerOptional.isPresent()) {
+                ModJam.LOGGER.log(Level.DEBUG, "Has item handler!");
+                IItemHandler itemHandler = itemHandlerOptional.orElse(null);
+                ItemStack stack1 = stack.copy();
+                int i = 0;
+                while (!stack1.isEmpty() && i < itemHandler.getSlots()) {
+                    if (itemHandler.isItemValid(i, stack1)) {
+                        stack1 = itemHandler.insertItem(i, stack1, true);
+                    }
+                    i++;
+                }
+                if (stack1.isEmpty()) {
+                    i = 0;
+                    stack1 = stack;
+                    while (!stack1.isEmpty() && i < itemHandler.getSlots()) {
+                        if (itemHandler.isItemValid(i, stack1)) {
+                            stack1 = itemHandler.insertItem(i, stack1, false);
+                        }
+                        i++;
+                    }
+                    return true;
+                }
+            }
+            return false;
         });
     }
     private static Vec3d getOffsetSpawnVec (BlockPos pos, Direction d) {
