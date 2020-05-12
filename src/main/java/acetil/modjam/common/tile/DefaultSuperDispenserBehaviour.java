@@ -16,12 +16,10 @@ import net.minecraft.block.IBucketPickupHandler;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.enchantment.Enchantments;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.SharedMonsterAttributes;
-import net.minecraft.entity.SpawnReason;
+import net.minecraft.entity.*;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.entity.item.ItemEntity;
+import net.minecraft.entity.passive.CowEntity;
 import net.minecraft.entity.passive.SheepEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.fluid.Fluid;
@@ -195,7 +193,7 @@ public class DefaultSuperDispenserBehaviour {
     public static void addDefaultFluidBehaviours () {
         SuperDispenserBehaviour.registerFluid((ItemStack stack) -> stack.getItem() == Items.BUCKET, DESTROY, FLUID_BEHAVIOUR);
     }
-    
+
     @SuppressWarnings("deprecation")
     public static void addDefaultEntityBehaviours () {
 
@@ -222,9 +220,20 @@ public class DefaultSuperDispenserBehaviour {
             }
             return false;
         });
+        SuperDispenserBehaviour.registerEntity((ItemStack stack) -> stack.getItem() == Items.BUCKET, DESTROY,
+                (ItemStack stack, Entity entity, Direction d) -> {
+            if (entity.getType() == EntityType.COW && !((CowEntity)entity).isChild()) {
+                // no way of getting around this unfortunately. Probably have to add modded cow entities manually
+                // hopefully mods have better ways of doing it
+                // you can't milk those
+                entity.world.addEntity(new ItemEntity(entity.getEntityWorld(), entity.getPosX(),
+                        entity.getPosY(), entity.getPosZ(), new ItemStack(Items.MILK_BUCKET)));
+                return true;
+            }
+            return false;
+        });
     }
     private static void damageEntity (ItemStack stack, Entity entity, Direction d, float initialDmg) {
-        //float dmg = EnchantmentHelper.getModifierForCreature(stack, ((LivingEntity) entity).getCreatureAttribute()) + stack.getItem().getAttributeModifiers(EquipmentSlotType.MAINHAND, stack).get();
         float dmg = initialDmg;
         float addedDmg = 0;
         float totalMult = 1;
