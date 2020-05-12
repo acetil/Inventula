@@ -1,34 +1,45 @@
 package acetil.modjam.common.tile;
 
 import acetil.modjam.common.ModJam;
+import acetil.modjam.common.constants.Constants;
 import acetil.modjam.common.entity.DispenserItemEntity;
 import acetil.modjam.common.network.DispenserEntitySpawnMessage;
 import acetil.modjam.common.network.PacketHandler;
 import acetil.modjam.common.particle.DispenserItemParticleData;
 import acetil.modjam.common.util.QuadFunction;
 import com.mojang.authlib.GameProfile;
+import com.sun.corba.se.spi.orb.Operation;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.IBucketPickupHandler;
+import net.minecraft.enchantment.Enchantment;
+import net.minecraft.enchantment.EnchantmentHelper;
+import net.minecraft.enchantment.Enchantments;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.SpawnReason;
+import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.fluid.Fluid;
 import net.minecraft.fluid.FluidState;
 import net.minecraft.fluid.Fluids;
 import net.minecraft.fluid.IFluidState;
+import net.minecraft.inventory.EquipmentSlotType;
 import net.minecraft.item.*;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ActionResultType;
+import net.minecraft.util.DamageSource;
 import net.minecraft.util.Direction;
 import net.minecraft.util.Hand;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.BlockRayTraceResult;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.math.Vec3i;
+import net.minecraft.util.math.*;
+import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
 import net.minecraft.world.server.ServerWorld;
+import net.minecraftforge.common.util.FakePlayer;
+import net.minecraftforge.common.util.FakePlayerFactory;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.event.ForgeEventFactory;
 import net.minecraftforge.fml.network.PacketDistributor;
@@ -45,6 +56,10 @@ public class DefaultSuperDispenserBehaviour {
     private static final double DIRECTION_MULT = 0.5;
     private static final double POSITION_OFFSET = 0.5;
     private static final double DISPENSER_ENTITY_VELOCITY = 1;
+    private static final float DEFAULT_DAMAGE = 1.0f;
+    private static final float DEFAULT_KNOCKBACK = 0.1f;
+    private static final float DEFAULT_KNOCKBACK_MULTIPLIER = 0.5f;
+    private static final int FIRE_TIME_MULTIPLIER = 4;
     public static final Function<ItemStack, ItemStack> ITEM_STACK_SHRINK = (ItemStack stack) -> {
         ItemStack stack1 = stack.copy();
         stack1.shrink(1);
@@ -177,6 +192,49 @@ public class DefaultSuperDispenserBehaviour {
     public static void addDefaultFluidBehaviours () {
         SuperDispenserBehaviour.registerFluid((ItemStack stack) -> stack.getItem() == Items.BUCKET, DESTROY, FLUID_BEHAVIOUR);
     }
+    public static void addDefaultEntityBehaviours () {
+
+        SuperDispenserBehaviour.registerEntity(MATCH_NOT_EMPTY,
+                DESTROY, (ItemStack stack, Entity entity, Direction d) -> {
+            if (entity instanceof LivingEntity && ((LivingEntity) entity).attackable()) {
+                ItemStack stack1 = stack.copy();
+                damageEntity(stack, entity, d, 1);
+                stack1.hitEntity((LivingEntity) entity, FakePlayerFactory.getMinecraft((ServerWorld) entity.world));
+                entity.world.addEntity(new ItemEntity(entity.world, entity.getPosX(), entity.getPosY(), entity.getPosZ(), stack1));
+                return true;
+            }
+            return false;
+        });
+    }
+    private static void damageEntity (ItemStack stack, Entity entity, Direction d, float initialDmg) {
+        //float dmg = EnchantmentHelper.getModifierForCreature(stack, ((LivingEntity) entity).getCreatureAttribute()) + stack.getItem().getAttributeModifiers(EquipmentSlotType.MAINHAND, stack).get();
+        float dmg = initialDmg;
+        float addedDmg = 0;
+        float totalMult = 1;
+        for (AttributeModifier mod :  stack.getAttributeModifiers(EquipmentSlotType.MAINHAND)
+                .get(SharedMonsterAttributes.ATTACK_DAMAGE.getName())) {
+            AttributeModifier.Operation op = mod.getOperation();
+            if (op == AttributeModifier.Operation.ADDITION) {
+                addedDmg += mod.getAmount();
+            } else if (op == AttributeModifier.Operation.MULTIPLY_BASE) {
+                dmg *= mod.getAmount();
+            } else {
+                totalMult *= mod.getAmount();
+            }
+        }
+        dmg = (dmg + addedDmg) * totalMult;
+        float knockback = EnchantmentHelper.getEnchantmentLevel(Enchantments.KNOCKBACK, stack) * DEFAULT_KNOCKBACK_MULTIPLIER
+                + DEFAULT_KNOCKBACK;
+        Vec3d dVec = new Vec3d(d.getDirectionVec());
+        entity.attackEntityFrom(DamageSource.GENERIC, dmg);
+        ((LivingEntity) entity).knockBack(FakePlayerFactory.getMinecraft((ServerWorld) entity.world), knockback,
+                dVec.getX(), dVec.getZ());
+        int fireTime = EnchantmentHelper.getEnchantmentLevel(Enchantments.FIRE_ASPECT, stack) * FIRE_TIME_MULTIPLIER;
+        if (fireTime > 0) {
+            entity.setFire(fireTime);
+        }
+    }
+
     private static Vec3d getOffsetSpawnVec (BlockPos pos, Direction d) {
         Vec3i vec1 = d.getDirectionVec();
         return new Vec3d(pos.getX() + POSITION_OFFSET + vec1.getX() * DIRECTION_MULT,

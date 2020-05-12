@@ -46,6 +46,7 @@ public class ModJam {
         DefaultSuperDispenserBehaviour.addDefaultInitialBehaviours();
         DefaultSuperDispenserBehaviour.addDefaultEffectBehaviours();
         DefaultSuperDispenserBehaviour.addDefaultFluidBehaviours();
+        DefaultSuperDispenserBehaviour.addDefaultEntityBehaviours();
         PacketHandler.registerMessages();
     }
     private void clientSetup (final FMLClientSetupEvent event) {

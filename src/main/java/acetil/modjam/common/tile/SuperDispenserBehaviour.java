@@ -2,6 +2,7 @@ package acetil.modjam.common.tile;
 
 import acetil.modjam.common.ModJam;
 import acetil.modjam.common.util.QuadFunction;
+import acetil.modjam.common.util.TriFunction;
 import net.minecraft.entity.Entity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Direction;
@@ -19,7 +20,7 @@ public class SuperDispenserBehaviour {
     private static final List<Behaviour<Behaviour.QuadArg<World, BlockPos, Direction>>> initialBehaviours = new ArrayList<>();
     private static final List<Behaviour<Behaviour.QuadArg<World, BlockPos, Direction>>> effectBehaviours = new ArrayList<>();
     private static final List<Behaviour<Behaviour.QuadArg<World, BlockPos, Direction>>> fluidBehaviours = new ArrayList<>();
-    private static final List<Behaviour<Behaviour.BiArg<Entity>>> entityBehaviours = new ArrayList<>();
+    private static final List<Behaviour<Behaviour.TriArg<Entity, Direction>>> entityBehaviours = new ArrayList<>();
     public static void registerInitial (Predicate<ItemStack> itemPredicate, Function<ItemStack, ItemStack> stackFunction,
                                  QuadFunction<ItemStack, World, BlockPos, Direction, Boolean> behaviour) {
         // for what happens when the item is dispensed
@@ -40,8 +41,8 @@ public class SuperDispenserBehaviour {
         fluidBehaviours.add(0, new Behaviour<>(itemPredicate, stackFunction, composeQuadArg(behaviour)));
     }
     public static void registerEntity (Predicate<ItemStack> itemPredicate, Function<ItemStack, ItemStack> stackFunction,
-                                       BiFunction<ItemStack, Entity, Boolean> behaviour) {
-        entityBehaviours.add(0, new Behaviour<>(itemPredicate, stackFunction, composeBiArg(behaviour)));
+                                       TriFunction<ItemStack, Entity, Direction, Boolean> behaviour) {
+        entityBehaviours.add(0, new Behaviour<>(itemPredicate, stackFunction, composeTriArg(behaviour)));
     }
 
     public static ItemStack evaluateInitial (ItemStack stack, World world, BlockPos pos, Direction direction, boolean doContinue) {
@@ -54,8 +55,8 @@ public class SuperDispenserBehaviour {
         ModJam.LOGGER.log(Level.DEBUG, "Evaluting fluid effects!");
         return evaluateBehaviours(new Behaviour.QuadArg<>(stack, world, pos, direction), fluidBehaviours, true);
     }
-    public static ItemStack evaluateEntity (ItemStack stack, Entity entity) {
-        return evaluateBehaviours(new Behaviour.BiArg<>(stack, entity), entityBehaviours, true);
+    public static ItemStack evaluateEntity (ItemStack stack, Entity entity, Direction direction) {
+        return evaluateBehaviours(new Behaviour.TriArg<>(stack, entity, direction), entityBehaviours, true);
     }
     public static <T extends IHasStack> ItemStack evaluateBehaviours (T t, List<Behaviour<T>> behaviours,
                                                boolean doContinue) {
@@ -76,8 +77,8 @@ public class SuperDispenserBehaviour {
     private static <T, U, V> Function<Behaviour.QuadArg<T, U, V>, Boolean> composeQuadArg (QuadFunction<ItemStack, T, U, V, Boolean> func) {
         return (Behaviour.QuadArg<T, U, V> quadArg) -> func.apply(quadArg.stack, quadArg.t, quadArg.u, quadArg.v);
     }
-    private static <T> Function<Behaviour.BiArg<T>, Boolean> composeBiArg (BiFunction<ItemStack, T, Boolean> func) {
-        return (Behaviour.BiArg<T> biArg) -> func.apply(biArg.stack, biArg.t);
+    private static <T, U> Function<Behaviour.TriArg<T, U>, Boolean> composeTriArg (TriFunction<ItemStack, T, U, Boolean> func) {
+        return (Behaviour.TriArg<T, U> triArg) -> func.apply(triArg.stack, triArg.t, triArg.u);
     }
     private interface IHasStack {
         ItemStack getStack ();
@@ -118,12 +119,14 @@ public class SuperDispenserBehaviour {
                 return stack;
             }
         }
-        public static class BiArg <T> implements IHasStack{
+        public static class TriArg <T, U> implements IHasStack{
             public final ItemStack stack;
             public final T t;
-            public BiArg (ItemStack stack, T t) {
+            public final U u;
+            public TriArg (ItemStack stack, T t, U u) {
                 this.stack = stack;
                 this.t = t;
+                this.u = u;
             }
 
             @Override

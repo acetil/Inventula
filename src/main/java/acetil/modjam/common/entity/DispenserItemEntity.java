@@ -23,10 +23,7 @@ import net.minecraft.network.datasync.DataSerializers;
 import net.minecraft.network.datasync.EntityDataManager;
 import net.minecraft.network.play.server.SSpawnObjectPacket;
 import net.minecraft.util.Direction;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.BlockRayTraceResult;
-import net.minecraft.util.math.RayTraceResult;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.*;
 import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
@@ -103,7 +100,9 @@ public class DispenserItemEntity extends ProjectileItemEntity {
         } else if (result.getType() == RayTraceResult.Type.ENTITY) {
             // TODO
             ItemStack stack = this.getDataManager().get(ITEMSTACK_DATA);
-            killEntity(stack);
+            Vec3d motion = getMotion();
+            killEntity(SuperDispenserBehaviour.evaluateEntity(stack, ((EntityRayTraceResult)result).getEntity(),
+                    Direction.getFacingFromVector(motion.getX(), 0, motion.getZ())));
         }
     }
     private void killEntity (ItemStack stack) {
