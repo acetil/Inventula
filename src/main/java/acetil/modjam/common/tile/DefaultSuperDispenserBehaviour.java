@@ -22,6 +22,7 @@ import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.SpawnReason;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.entity.item.ItemEntity;
+import net.minecraft.entity.passive.SheepEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.fluid.Fluid;
 import net.minecraft.fluid.FluidState;
@@ -38,6 +39,7 @@ import net.minecraft.util.math.*;
 import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
 import net.minecraft.world.server.ServerWorld;
+import net.minecraftforge.common.IShearable;
 import net.minecraftforge.common.util.FakePlayer;
 import net.minecraftforge.common.util.FakePlayerFactory;
 import net.minecraftforge.common.util.LazyOptional;
@@ -48,6 +50,7 @@ import net.minecraftforge.items.IItemHandler;
 import org.apache.logging.log4j.Level;
 
 import javax.annotation.Nullable;
+import java.util.List;
 import java.util.Random;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -192,6 +195,8 @@ public class DefaultSuperDispenserBehaviour {
     public static void addDefaultFluidBehaviours () {
         SuperDispenserBehaviour.registerFluid((ItemStack stack) -> stack.getItem() == Items.BUCKET, DESTROY, FLUID_BEHAVIOUR);
     }
+    
+    @SuppressWarnings("deprecation")
     public static void addDefaultEntityBehaviours () {
 
         SuperDispenserBehaviour.registerEntity(MATCH_NOT_EMPTY,
@@ -202,6 +207,18 @@ public class DefaultSuperDispenserBehaviour {
                 stack1.hitEntity((LivingEntity) entity, FakePlayerFactory.getMinecraft((ServerWorld) entity.world));
                 entity.world.addEntity(new ItemEntity(entity.world, entity.getPosX(), entity.getPosY(), entity.getPosZ(), stack1));
                 return true;
+            }
+            return false;
+        });
+        SuperDispenserBehaviour.registerEntity((ItemStack stack) -> stack.getItem() instanceof ShearsItem, DEGRADE,
+                (ItemStack stack, Entity entity, Direction d) -> {
+            if (entity instanceof IShearable && ((IShearable)entity).isShearable(stack, entity.getEntityWorld(), entity.getPosition())) {
+                 List<ItemStack> stacks = ((IShearable)entity).onSheared(stack, entity.getEntityWorld(), entity.getPosition(),
+                         EnchantmentHelper.getEnchantmentLevel(Enchantments.FORTUNE, stack));
+                 for (ItemStack s : stacks) {
+                     entity.world.addEntity(new ItemEntity(entity.world, entity.getPosX(), entity.getPosY(), entity.getPosZ(), s));
+                 }
+                 return true;
             }
             return false;
         });
