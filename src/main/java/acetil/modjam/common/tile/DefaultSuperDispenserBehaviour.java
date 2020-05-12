@@ -10,9 +10,14 @@ import com.mojang.authlib.GameProfile;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
+import net.minecraft.block.IBucketPickupHandler;
 import net.minecraft.entity.SpawnReason;
 import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.fluid.Fluid;
+import net.minecraft.fluid.FluidState;
+import net.minecraft.fluid.Fluids;
+import net.minecraft.fluid.IFluidState;
 import net.minecraft.item.*;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ActionResultType;
@@ -55,7 +60,21 @@ public class DefaultSuperDispenserBehaviour {
         }
         return stack;
     };
-
+    private static final QuadFunction<ItemStack, World, BlockPos, Direction, Boolean> FLUID_BEHAVIOUR =
+            (ItemStack stack, World world, BlockPos pos, Direction d) -> {
+        ModJam.LOGGER.log(Level.DEBUG, "Attempting to pick up fluid!");
+        BlockState state = world.getBlockState(pos);
+        ModJam.LOGGER.log(Level.DEBUG, "Block: {}", state.getBlock().getRegistryName().toString());
+        if (state.getBlock() instanceof IBucketPickupHandler) {
+            ModJam.LOGGER.log(Level.DEBUG, "Bucket pickup handler!");
+            Fluid fluid = ((IBucketPickupHandler) state.getBlock()).pickupFluid(world, pos, state);
+            if (fluid != Fluids.EMPTY) {
+                world.addEntity(new ItemEntity(world, pos.getX(), pos.getY(), pos.getZ(), new ItemStack(fluid.getFilledBucket())));
+                return true;
+            }
+        }
+        return false;
+    };
     public static final QuadFunction<ItemStack, World, BlockPos, Direction, Boolean> SPAWN_DISPENSER_ENTITY =
             (ItemStack stack, World world, BlockPos pos, Direction d) -> {
                 // TODO: deal with case when block in front of dispenser
@@ -153,7 +172,10 @@ public class DefaultSuperDispenserBehaviour {
         });
         SuperDispenserBehaviour.registerEffect((ItemStack stack) -> stack.getItem() instanceof BoneMealItem, DESTROY,
                 (ItemStack stack, World world, BlockPos pos, Direction d) -> BoneMealItem.applyBonemeal(stack.copy(), world, pos));
-
+        SuperDispenserBehaviour.registerEffect((ItemStack stack) -> stack.getItem() == Items.BUCKET, DESTROY, FLUID_BEHAVIOUR);
+    }
+    public static void addDefaultFluidBehaviours () {
+        SuperDispenserBehaviour.registerFluid((ItemStack stack) -> stack.getItem() == Items.BUCKET, DESTROY, FLUID_BEHAVIOUR);
     }
     private static Vec3d getOffsetSpawnVec (BlockPos pos, Direction d) {
         Vec3i vec1 = d.getDirectionVec();

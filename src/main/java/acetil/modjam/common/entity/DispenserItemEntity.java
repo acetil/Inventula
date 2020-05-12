@@ -10,6 +10,10 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.entity.projectile.ProjectileItemEntity;
+import net.minecraft.fluid.Fluid;
+import net.minecraft.fluid.FluidState;
+import net.minecraft.fluid.Fluids;
+import net.minecraft.fluid.IFluidState;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
@@ -35,6 +39,7 @@ public class DispenserItemEntity extends ProjectileItemEntity {
             EntityDataManager.createKey(DispenserItemEntity.class, DataSerializers.BLOCK_POS);
     private Vec3d initialPos;
     private Vec3d initialVel;
+    private BlockPos prevPos = new BlockPos (0, 0, 0);
     public DispenserItemEntity (EntityType<? extends ProjectileItemEntity> type, World worldIn) {
         super(type, worldIn);
     }
@@ -133,4 +138,18 @@ public class DispenserItemEntity extends ProjectileItemEntity {
                 initialPos, initialVel, 10, getEntityId()), NetworkDirection.PLAY_TO_CLIENT);
     }
 
+    @Override
+    public void tick () {
+        super.tick();
+        if (!getPosition().equals(prevPos)) {
+            IFluidState state = world.getFluidState(getPosition());
+            if (state.getFluid() != Fluids.EMPTY) {
+                Vec3d motion = getMotion();
+                killEntity(SuperDispenserBehaviour.evaluateEffectFluid(getItem(), world, getPosition(),
+                        Direction.getFacingFromVector(motion.getX(), motion.getY(), motion.getZ())));
+            } else {
+                prevPos = getPosition();
+            }
+        }
+    }
 }

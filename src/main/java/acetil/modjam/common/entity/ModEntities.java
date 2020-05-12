@@ -13,5 +13,5 @@ public class ModEntities {
 
     public static RegistryObject<EntityType<DispenserItemEntity>> DISPENSER_ITEM_ENTITY = ENTITIES.register("dispenser_item",
             () -> EntityType.Builder.<DispenserItemEntity>create(DispenserItemEntity::new, EntityClassification.MISC)
-                    .size(0.25f, 0.25f).build("dispenser_item"));
+                    .size(0.25f, 0.25f).immuneToFire().build("dispenser_item"));
 }
