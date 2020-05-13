@@ -1,6 +1,7 @@
 package acetil.modjam.client.particle;
 
 import acetil.modjam.client.WorldParticleTracker;
+import acetil.modjam.common.ModJam;
 import acetil.modjam.common.particle.DispenserItemParticleData;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.vertex.IVertexBuilder;
@@ -16,6 +17,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.LightType;
 import net.minecraft.world.World;
+import org.apache.logging.log4j.Level;
 
 public class DispenserItemParticle extends Particle {
     private static final double GRAVITY_ACCELERATION = 0.03;
@@ -42,7 +44,7 @@ public class DispenserItemParticle extends Particle {
     }
     @Override
     public void renderParticle (IVertexBuilder buffer, ActiveRenderInfo renderInfo, float partialTicks) {
-        IRenderTypeBuffer.Impl renderBuffer = IRenderTypeBuffer.getImpl(Tessellator.getInstance().getBuffer());
+        IRenderTypeBuffer.Impl renderBuffer = Minecraft.getInstance().worldRenderer.renderTypeTextures.getBufferSource();
         IBakedModel model = itemRenderer.getItemModelWithOverrides(stack, world, null);
         MatrixStack matrixStack  = new MatrixStack();
         matrixStack.push();
