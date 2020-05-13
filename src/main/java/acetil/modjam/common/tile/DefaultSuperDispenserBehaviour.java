@@ -67,6 +67,7 @@ public class DefaultSuperDispenserBehaviour {
     private static final int REQUIRED_HONEY_LEVEL = 5;
     private static final int DISPENSER_SOUND_ID = 1000;
     private static final int DISPENSER_PARTICLES_ID = 2000;
+    private static final int BLOCK_DESTRUCTION_ID = 2001;
     public static final Function<ItemStack, ItemStack> ITEM_STACK_SHRINK = (ItemStack stack) -> {
         ItemStack stack1 = stack.copy();
         stack1.shrink(1);
@@ -301,6 +302,10 @@ public class DefaultSuperDispenserBehaviour {
             BlockState state = world.getBlockState(pos);
             if (stack.getItem().getToolTypes(stack).contains(state.getHarvestTool()) && stack.canHarvestBlock(state)) {
                 Block.spawnDrops(state, world, pos, null, null, stack);
+                SoundType soundType = state.getSoundType();
+                world.playSound(pos.getX(), pos.getY(), pos.getZ(), soundType.getBreakSound(),
+                        SoundCategory.BLOCKS, soundType.getVolume(), soundType.getPitch(), false);
+                world.playEvent(BLOCK_DESTRUCTION_ID, pos, Block.getStateId(state));
                 world.setBlockState(pos, Blocks.AIR.getDefaultState());
                 return true;
             } else {
