@@ -1,6 +1,7 @@
 package acetil.modjam.common.tile;
 
 import acetil.modjam.common.ModJam;
+import acetil.modjam.common.util.QuadConsumer;
 import acetil.modjam.common.util.QuadFunction;
 import acetil.modjam.common.util.TriFunction;
 import net.minecraft.entity.Entity;
@@ -12,9 +13,7 @@ import org.apache.logging.log4j.Level;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.BiFunction;
-import java.util.function.Function;
-import java.util.function.Predicate;
+import java.util.function.*;
 
 public class SuperDispenserBehaviour {
     private static final List<Behaviour<Behaviour.QuadArg<World, BlockPos, Direction>>> initialBehaviours = new ArrayList<>();
@@ -27,9 +26,15 @@ public class SuperDispenserBehaviour {
         // itemstack function is what happens TO THE SLOT, and triggers only when behaviour returns true
         // effects are added in order of increasing priority
         // boolean is for the success of the behaviour.
-        initialBehaviours.add(0, new Behaviour<>(itemPredicate, stackFunction, composeQuadArg(behaviour)));
+        initialBehaviours.add(0, new Behaviour<>(itemPredicate, stackFunction, composeQuadArg(behaviour),
+                composeQuadConsume(DefaultSuperDispenserBehaviour.DEFAULT_ON_SUCCESS)));
     }
-
+    public static void registerInitial (Predicate<ItemStack> itemPredicate, Function<ItemStack, ItemStack> stackFunction,
+                                        QuadConsumer<ItemStack, World, BlockPos, Direction> onSuccess,
+                                        QuadFunction<ItemStack, World, BlockPos, Direction, Boolean> behaviour) {
+        initialBehaviours.add(0, new Behaviour<>(itemPredicate, stackFunction, composeQuadArg(behaviour),
+                composeQuadConsume(onSuccess)));
+    };
     public static void registerEffect (Predicate<ItemStack> itemPredicate, Function<ItemStack, ItemStack> stackFunction,
                                              QuadFunction<ItemStack, World, BlockPos, Direction, Boolean> behaviour) {
         // for what happens after the dispensed entity contacts a block
@@ -65,6 +70,7 @@ public class SuperDispenserBehaviour {
             if (b.testStack(t.getStack())) {
                 boolean result = b.tryEvaluateBehaviour(t);
                 if (result) {
+                    b.onSuccess(t);
                     resultStack = b.applyStackFunction(t.getStack());
                 }
                 if (result || !doContinue) {
@@ -80,6 +86,9 @@ public class SuperDispenserBehaviour {
     private static <T, U> Function<Behaviour.TriArg<T, U>, Boolean> composeTriArg (TriFunction<ItemStack, T, U, Boolean> func) {
         return (Behaviour.TriArg<T, U> triArg) -> func.apply(triArg.stack, triArg.t, triArg.u);
     }
+    private static <T, U, V> Consumer<Behaviour.QuadArg<T, U, V>> composeQuadConsume (QuadConsumer<ItemStack, T, U, V> consume) {
+        return (Behaviour.QuadArg<T, U, V> quadArg) -> consume.accept(quadArg.stack, quadArg.t, quadArg.u, quadArg.v);
+    }
     private interface IHasStack {
         ItemStack getStack ();
     }
@@ -87,11 +96,20 @@ public class SuperDispenserBehaviour {
         private final Predicate<ItemStack> itemPredicate;
         private final Function<ItemStack, ItemStack> stackFunction;
         private final Function<T, Boolean> behaviour;
+        private final Consumer<T> onSuccess;
         public Behaviour (Predicate<ItemStack> itemPredicate, Function<ItemStack, ItemStack> stackFunction,
                           Function<T, Boolean> behaviour) {
             this.itemPredicate = itemPredicate;
             this.stackFunction = stackFunction;
             this.behaviour = behaviour;
+            this.onSuccess = (T t) -> {};
+        }
+        public Behaviour (Predicate<ItemStack> itemPredicate, Function<ItemStack, ItemStack> stackFunction,
+                          Function<T, Boolean> behaviour, Consumer<T> onSuccess) {
+            this.itemPredicate = itemPredicate;
+            this.stackFunction = stackFunction;
+            this.behaviour = behaviour;
+            this.onSuccess = onSuccess;
         }
         public boolean testStack (ItemStack stack) {
             return itemPredicate.test(stack);
@@ -101,6 +119,9 @@ public class SuperDispenserBehaviour {
         }
         public boolean tryEvaluateBehaviour (T t) {
             return behaviour.apply(t);
+        }
+        public void onSuccess (T t) {
+            this.onSuccess.accept(t);
         }
         public static class QuadArg <T, U, V> implements IHasStack{
             public final ItemStack stack;

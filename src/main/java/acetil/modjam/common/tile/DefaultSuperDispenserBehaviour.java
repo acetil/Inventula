@@ -2,6 +2,7 @@ package acetil.modjam.common.tile;
 
 import acetil.modjam.common.ModJam;
 import acetil.modjam.common.entity.DispenserItemEntity;
+import acetil.modjam.common.util.QuadConsumer;
 import acetil.modjam.common.util.QuadFunction;
 import net.minecraft.block.*;
 import net.minecraft.enchantment.EnchantmentHelper;
@@ -64,6 +65,8 @@ public class DefaultSuperDispenserBehaviour {
     private static final float CHARGE_DOFF_MULT = 0.3f;
     private static final float CHARGE_VEL_RND_MULT = 0.05f;
     private static final int REQUIRED_HONEY_LEVEL = 5;
+    private static final int DISPENSER_SOUND_ID = 1000;
+    private static final int DISPENSER_PARTICLES_ID = 2000;
     public static final Function<ItemStack, ItemStack> ITEM_STACK_SHRINK = (ItemStack stack) -> {
         ItemStack stack1 = stack.copy();
         stack1.shrink(1);
@@ -78,6 +81,11 @@ public class DefaultSuperDispenserBehaviour {
             stack.shrink(1);
         }
         return stack;
+    };
+    public static final QuadConsumer<ItemStack, World, BlockPos, Direction> DEFAULT_ON_SUCCESS =
+            (ItemStack stack, World world, BlockPos pos, Direction d) -> {
+        world.playEvent(DISPENSER_SOUND_ID, pos, 0);
+        world.playEvent(DISPENSER_PARTICLES_ID, pos, d.getIndex());
     };
     private static final QuadFunction<ItemStack, World, BlockPos, Direction, Boolean> FLUID_BEHAVIOUR =
             (ItemStack stack, World world, BlockPos pos, Direction d) -> {
