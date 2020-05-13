@@ -13,6 +13,7 @@ import net.minecraft.entity.item.FireworkRocketEntity;
 import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.entity.item.TNTEntity;
 import net.minecraft.entity.passive.CowEntity;
+import net.minecraft.entity.passive.SheepEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.projectile.*;
 import net.minecraft.fluid.Fluid;
@@ -20,6 +21,8 @@ import net.minecraft.fluid.Fluids;
 import net.minecraft.inventory.EquipmentSlotType;
 import net.minecraft.item.*;
 import net.minecraft.state.properties.BlockStateProperties;
+import net.minecraft.tags.BlockTags;
+import net.minecraft.tileentity.BeehiveTileEntity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.*;
 import net.minecraft.util.math.*;
@@ -57,6 +60,7 @@ public class DefaultSuperDispenserBehaviour {
     private static final float FIREWORK_INACCURACY = 1.0f;
     private static final float CHARGE_DOFF_MULT = 0.3f;
     private static final float CHARGE_VEL_RND_MULT = 0.05f;
+    private static final int REQUIRED_HONEY_LEVEL = 5;
     public static final Function<ItemStack, ItemStack> ITEM_STACK_SHRINK = (ItemStack stack) -> {
         ItemStack stack1 = stack.copy();
         stack1.shrink(1);
@@ -341,6 +345,25 @@ public class DefaultSuperDispenserBehaviour {
         SuperDispenserBehaviour.registerEffect((ItemStack stack) -> stack.getItem() instanceof BoneMealItem, DESTROY,
                 (ItemStack stack, World world, BlockPos pos, Direction d) -> BoneMealItem.applyBonemeal(stack.copy(), world, pos));
         SuperDispenserBehaviour.registerEffect((ItemStack stack) -> stack.getItem() == Items.BUCKET, DESTROY, FLUID_BEHAVIOUR);
+        SuperDispenserBehaviour.registerEffect(matchesItem(Items.GLASS_BOTTLE), (ItemStack stack) -> new ItemStack(Items.HONEY_BOTTLE),
+                (ItemStack stack, World world, BlockPos pos, Direction d) -> {
+            BlockState state = world.getBlockState(pos);
+            if (state.isIn(BlockTags.BEEHIVES) && state.get(BeehiveBlock.HONEY_LEVEL) >= REQUIRED_HONEY_LEVEL) {
+                ((BeehiveBlock)state.getBlock()).takeHoney(world, state, pos, null, BeehiveTileEntity.State.BEE_RELEASED);
+                return true;
+            }
+            return false;
+        });
+        SuperDispenserBehaviour.registerEffect((ItemStack stack) -> stack.getItem() instanceof ShearsItem, DEGRADE,
+                (ItemStack stack, World world, BlockPos pos, Direction d) -> {
+            BlockState state = world.getBlockState(pos);
+            if (state.isIn(BlockTags.BEEHIVES) && state.get(BeehiveBlock.HONEY_LEVEL) >= REQUIRED_HONEY_LEVEL) {
+                BeehiveBlock.dropHoneyComb(world, pos);
+                ((BeehiveBlock)state.getBlock()).takeHoney(world, state, pos, null, BeehiveTileEntity.State.BEE_RELEASED);
+                return true;
+            }
+            return false;
+        });
     }
     public static void addDefaultFluidBehaviours () {
         SuperDispenserBehaviour.registerFluid((ItemStack stack) -> stack.getItem() == Items.BUCKET, DESTROY, FLUID_BEHAVIOUR);
