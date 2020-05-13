@@ -300,7 +300,8 @@ public class DefaultSuperDispenserBehaviour {
         });
         SuperDispenserBehaviour.registerEffect(MATCH_NOT_EMPTY, DEGRADE, (ItemStack stack, World world, BlockPos pos, Direction d) -> {
             BlockState state = world.getBlockState(pos);
-            if (stack.getItem().getToolTypes(stack).contains(state.getHarvestTool()) && stack.canHarvestBlock(state)) {
+            if (stack.getItem().getToolTypes(stack).contains(state.getHarvestTool()) &&
+                    !(stack.getItem() instanceof PickaxeItem && !stack.canHarvestBlock(state))) {
                 Block.spawnDrops(state, world, pos, null, null, stack);
                 SoundType soundType = state.getSoundType();
                 world.playSound(pos.getX(), pos.getY(), pos.getZ(), soundType.getBreakSound(),
