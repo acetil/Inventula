@@ -20,8 +20,11 @@ import net.minecraft.fluid.Fluid;
 import net.minecraft.fluid.Fluids;
 import net.minecraft.inventory.EquipmentSlotType;
 import net.minecraft.item.*;
+import net.minecraft.potion.PotionUtils;
+import net.minecraft.potion.Potions;
 import net.minecraft.state.properties.BlockStateProperties;
 import net.minecraft.tags.BlockTags;
+import net.minecraft.tags.FluidTags;
 import net.minecraft.tileentity.BeehiveTileEntity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.*;
@@ -367,6 +370,8 @@ public class DefaultSuperDispenserBehaviour {
     }
     public static void addDefaultFluidBehaviours () {
         SuperDispenserBehaviour.registerFluid((ItemStack stack) -> stack.getItem() == Items.BUCKET, DESTROY, FLUID_BEHAVIOUR);
+        SuperDispenserBehaviour.registerFluid(matchesItem(Items.GLASS_BOTTLE), (ItemStack stack) -> PotionUtils.addPotionToItemStack(new ItemStack(Items.POTION), Potions.WATER),
+                (ItemStack stack, World world, BlockPos pos, Direction d) -> world.getFluidState(pos).isTagged(FluidTags.WATER));
     }
 
     @SuppressWarnings("deprecation")

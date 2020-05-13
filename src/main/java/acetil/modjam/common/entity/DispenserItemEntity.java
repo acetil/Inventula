@@ -139,7 +139,6 @@ public class DispenserItemEntity extends ProjectileItemEntity {
 
     @Override
     public void tick () {
-        super.tick();
         if (!getPosition().equals(prevPos)) {
             IFluidState state = world.getFluidState(getPosition());
             if (state.getFluid() != Fluids.EMPTY) {
@@ -150,5 +149,6 @@ public class DispenserItemEntity extends ProjectileItemEntity {
                 prevPos = getPosition();
             }
         }
+        super.tick();
     }
 }
