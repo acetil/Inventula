@@ -1,48 +1,34 @@
 package acetil.modjam.common.tile;
 
 import acetil.modjam.common.ModJam;
-import acetil.modjam.common.constants.Constants;
 import acetil.modjam.common.entity.DispenserItemEntity;
-import acetil.modjam.common.network.DispenserEntitySpawnMessage;
-import acetil.modjam.common.network.PacketHandler;
-import acetil.modjam.common.particle.DispenserItemParticleData;
 import acetil.modjam.common.util.QuadFunction;
-import com.mojang.authlib.GameProfile;
-import com.sun.corba.se.spi.orb.Operation;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.block.IBucketPickupHandler;
-import net.minecraft.enchantment.Enchantment;
+import net.minecraft.block.*;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.enchantment.Enchantments;
 import net.minecraft.entity.*;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
+import net.minecraft.entity.item.ExperienceBottleEntity;
+import net.minecraft.entity.item.FireworkRocketEntity;
 import net.minecraft.entity.item.ItemEntity;
+import net.minecraft.entity.item.TNTEntity;
 import net.minecraft.entity.passive.CowEntity;
-import net.minecraft.entity.passive.SheepEntity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.projectile.*;
 import net.minecraft.fluid.Fluid;
-import net.minecraft.fluid.FluidState;
 import net.minecraft.fluid.Fluids;
-import net.minecraft.fluid.IFluidState;
 import net.minecraft.inventory.EquipmentSlotType;
 import net.minecraft.item.*;
+import net.minecraft.state.properties.BlockStateProperties;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.ActionResultType;
-import net.minecraft.util.DamageSource;
-import net.minecraft.util.Direction;
-import net.minecraft.util.Hand;
+import net.minecraft.util.*;
 import net.minecraft.util.math.*;
-import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
 import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.common.IShearable;
-import net.minecraftforge.common.util.FakePlayer;
 import net.minecraftforge.common.util.FakePlayerFactory;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.event.ForgeEventFactory;
-import net.minecraftforge.fml.network.PacketDistributor;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 import org.apache.logging.log4j.Level;
@@ -61,6 +47,16 @@ public class DefaultSuperDispenserBehaviour {
     private static final float DEFAULT_KNOCKBACK = 0.1f;
     private static final float DEFAULT_KNOCKBACK_MULTIPLIER = 0.5f;
     private static final int FIRE_TIME_MULTIPLIER = 4;
+    private static final float ARROW_SPEED = 1.1f;
+    private static final float ARROW_INACCURACY = 6.0f;
+    private static final float ARROW_Y_OFFSET = 0.1f;
+    private static final float POTION_SPEED = ARROW_SPEED * 1.25f;
+    private static final float POTION_INACCURACY = ARROW_INACCURACY * 0.5f;
+    private static final float FIREWORK_Y_OFFSET = 0.2f;
+    private static final float FIREWORK_SPEED = 0.5f;
+    private static final float FIREWORK_INACCURACY = 1.0f;
+    private static final float CHARGE_DOFF_MULT = 0.3f;
+    private static final float CHARGE_VEL_RND_MULT = 0.05f;
     public static final Function<ItemStack, ItemStack> ITEM_STACK_SHRINK = (ItemStack stack) -> {
         ItemStack stack1 = stack.copy();
         stack1.shrink(1);
@@ -118,6 +114,162 @@ public class DefaultSuperDispenserBehaviour {
             return true;
         });
         SuperDispenserBehaviour.registerInitial(MATCH_NOT_EMPTY, ITEM_STACK_SHRINK, SPAWN_DISPENSER_ENTITY);
+        SuperDispenserBehaviour.registerInitial(matchesItem(Items.ARROW), ITEM_STACK_SHRINK,
+                (ItemStack stack, World world, BlockPos pos, Direction d) -> {
+            if (world.getBlockState(pos.add(d.getXOffset(), d.getYOffset(), d.getZOffset())).getBlock() != Blocks.AIR) {
+                return false;
+            }
+            Vec3d spawnVec = getOffsetSpawnVec(pos, d);
+            ArrowEntity entity = new ArrowEntity(world, spawnVec.getX(), spawnVec.getY(), spawnVec.getZ());
+            entity.pickupStatus = AbstractArrowEntity.PickupStatus.ALLOWED;
+            entity.shoot(d.getXOffset(), d.getYOffset() + ARROW_Y_OFFSET, d.getZOffset(), ARROW_SPEED, ARROW_INACCURACY);
+            world.addEntity(entity);
+            return true;
+        });
+        SuperDispenserBehaviour.registerInitial(matchesItem(Items.TIPPED_ARROW), ITEM_STACK_SHRINK,
+                (ItemStack stack, World world, BlockPos pos, Direction d) -> {
+            if (world.getBlockState(pos.offset(d)).getBlock() != Blocks.AIR) {
+                return false;
+            }
+            Vec3d spawnVec = getOffsetSpawnVec(pos, d);
+            ArrowEntity entity = new ArrowEntity(world, spawnVec.getX(), spawnVec.getY(), spawnVec.getZ());
+            entity.setPotionEffect(stack);
+            entity.pickupStatus = AbstractArrowEntity.PickupStatus.ALLOWED;
+            entity.shoot(d.getXOffset(), d.getYOffset() + ARROW_Y_OFFSET, d.getZOffset(), ARROW_SPEED, ARROW_INACCURACY);
+            world.addEntity(entity);
+            return true;
+        });
+        SuperDispenserBehaviour.registerInitial(matchesItem(Items.SPECTRAL_ARROW), ITEM_STACK_SHRINK,
+                (ItemStack stack, World world, BlockPos pos, Direction d) -> {
+            if (world.getBlockState(pos.offset(d)).getBlock() != Blocks.AIR) {
+                return false;
+            }
+            Vec3d spawnVec = getOffsetSpawnVec(pos, d);
+            SpectralArrowEntity entity = new SpectralArrowEntity(world, spawnVec.getX(), spawnVec.getY(), spawnVec.getZ());
+            entity.pickupStatus = AbstractArrowEntity.PickupStatus.ALLOWED;
+            entity.shoot(d.getXOffset(), d.getYOffset() + ARROW_Y_OFFSET, d.getZOffset(), ARROW_SPEED, ARROW_INACCURACY);
+            world.addEntity(entity);
+            return true;
+        });
+        SuperDispenserBehaviour.registerInitial(matchesItem(Items.EGG), ITEM_STACK_SHRINK,
+                (ItemStack stack, World world, BlockPos pos, Direction d) -> {
+            if (world.getBlockState(pos.offset(d)).getBlock() != Blocks.AIR) {
+                return false;
+            }
+            Vec3d spawnVec = getOffsetSpawnVec(pos, d);
+            EggEntity entity = Util.make(new EggEntity(world, spawnVec.getX(), spawnVec.getY(), spawnVec.getZ()),
+                    (EggEntity e) -> e.setItem(stack));
+            entity.shoot(d.getXOffset(), d.getYOffset() + ARROW_Y_OFFSET, d.getZOffset(), ARROW_SPEED, ARROW_INACCURACY);
+            world.addEntity(entity);
+            return true;
+        });
+        SuperDispenserBehaviour.registerInitial(matchesItem(Items.SNOWBALL), ITEM_STACK_SHRINK, (ItemStack stack, World world, BlockPos pos, Direction d) -> {
+            if (world.getBlockState(pos.offset(d)).getBlock() != Blocks.AIR) {
+                return false;
+            }
+            Vec3d spawnVec = getOffsetSpawnVec(pos, d);
+            SnowballEntity entity = Util.make(new SnowballEntity(world, spawnVec.getX(), spawnVec.getY(), spawnVec.getZ()),
+                    (SnowballEntity e) -> e.setItem(stack));
+            entity.shoot(d.getXOffset(), d.getYOffset() + ARROW_Y_OFFSET, d.getZOffset(), ARROW_SPEED, ARROW_INACCURACY);
+            world.addEntity(entity);
+            return true;
+        });
+        SuperDispenserBehaviour.registerInitial(matchesItem(Items.EXPERIENCE_BOTTLE), ITEM_STACK_SHRINK,
+                (ItemStack stack, World world, BlockPos pos, Direction d) -> {
+            if (world.getBlockState(pos.offset(d)).getBlock() != Blocks.AIR) {
+                return false;
+            }
+            Vec3d spawnVec = getOffsetSpawnVec(pos, d);
+            ExperienceBottleEntity entity = Util.make(new ExperienceBottleEntity(world, spawnVec.getX(), spawnVec.getY(), spawnVec.getZ()),
+                    (ExperienceBottleEntity e) -> e.setItem(stack));
+            entity.shoot(d.getXOffset(), d.getYOffset() + ARROW_Y_OFFSET, d.getZOffset(), POTION_SPEED, POTION_INACCURACY);
+            world.addEntity(entity);
+            return true;
+        });
+        SuperDispenserBehaviour.registerInitial((ItemStack stack) -> stack.getItem() == Items.SPLASH_POTION || stack.getItem() == Items.LINGERING_POTION,
+                ITEM_STACK_SHRINK, (ItemStack stack, World world, BlockPos pos, Direction d) -> {
+            if (world.getBlockState(pos.offset(d)).getBlock() != Blocks.AIR) {
+                return false;
+            }
+            Vec3d spawnVec = getOffsetSpawnVec(pos, d);
+            PotionEntity entity = Util.make(new PotionEntity(world, spawnVec.getX(), spawnVec.getY(), spawnVec.getZ()),
+                    (PotionEntity e) -> e.setItem(stack));
+            entity.shoot(d.getXOffset(), d.getYOffset() + ARROW_Y_OFFSET, d.getZOffset(), POTION_SPEED, POTION_INACCURACY);
+            world.addEntity(entity);
+            return true;
+        });
+        SuperDispenserBehaviour.registerInitial((ItemStack stack) -> stack.getItem() instanceof SpawnEggItem, ITEM_STACK_SHRINK,
+                (ItemStack stack, World world, BlockPos pos, Direction d) -> {
+            if (world.getBlockState(pos.offset(d)).getBlock() != Blocks.AIR) {
+                return false;
+            }
+            ((SpawnEggItem)stack.getItem()).getType(stack.getTag())
+                    .spawn(world, stack, null, pos.offset(d), SpawnReason.DISPENSER, d != Direction.UP, false);
+            return true;
+        });
+        SuperDispenserBehaviour.registerInitial(matchesItem(Items.FIREWORK_ROCKET), ITEM_STACK_SHRINK,
+                (ItemStack stack, World world, BlockPos pos, Direction d) -> {
+            if (world.getBlockState(pos.offset(d)).getBlock() != Blocks.AIR) {
+                return false;
+            }
+            Vec3d dVec = new Vec3d(d.getDirectionVec());
+            FireworkRocketEntity entity = new FireworkRocketEntity(world, stack, dVec.getX() + pos.getX(),
+                    pos.getY() + FIREWORK_Y_OFFSET, dVec.getZ() + pos.getZ(), true);
+            entity.shoot(dVec.getX(), dVec.getY(), dVec.getZ(), FIREWORK_SPEED, FIREWORK_INACCURACY);
+            world.addEntity(entity);
+            return true;
+        });
+        SuperDispenserBehaviour.registerInitial(matchesItem(Items.FIRE_CHARGE), ITEM_STACK_SHRINK,
+                (ItemStack stack, World world, BlockPos pos, Direction d) -> {
+            if (world.getBlockState(pos.offset(d)).getBlock() != Blocks.AIR) {
+                return false;
+            }
+            Vec3d dVec = new Vec3d(d.getDirectionVec());
+            Vec3d offVec = getOffsetSpawnVec(pos, d);
+            Random rand = world.getRandom();
+            Vec3d startVec = offVec.add(dVec.scale(CHARGE_DOFF_MULT));
+            Vec3d velVec = dVec.add(new Vec3d(rand.nextGaussian(), rand.nextGaussian(), rand.nextGaussian()).scale(CHARGE_VEL_RND_MULT));
+            world.addEntity(Util.make(new SmallFireballEntity(world, startVec.getX(), startVec.getY(), startVec.getZ(),
+                    velVec.getX(), velVec.getY(), velVec.getZ()), (SmallFireballEntity e) -> e.setStack(stack)));
+            return true;
+        });
+        SuperDispenserBehaviour.registerInitial((ItemStack stack) -> stack.getItem() instanceof BucketItem && stack.getItem() != Items.BUCKET,
+                (ItemStack stack) -> new ItemStack(Items.BUCKET), (ItemStack stack, World world, BlockPos pos, Direction d) -> {
+            BlockState state = world.getBlockState(pos.offset(d));
+            if (((BucketItem) stack.getItem()).tryPlaceContainedLiquid(null, world, pos.offset(d), null)) {
+                ((BucketItem) stack.getItem()).onLiquidPlaced(world, stack, pos.offset(d));
+                return true;
+            }
+            return false;
+        });
+        SuperDispenserBehaviour.registerInitial((ItemStack stack) -> stack.getItem() instanceof FlintAndSteelItem, (ItemStack stack) -> stack,
+                (ItemStack stack, World world, BlockPos pos, Direction d) -> true);
+        SuperDispenserBehaviour.registerInitial((ItemStack stack) -> stack.getItem() instanceof FlintAndSteelItem, DEGRADE,
+                (ItemStack stack, World world, BlockPos pos, Direction d) -> {
+            BlockPos newPos = pos.offset(d);
+            BlockState state = world.getBlockState(newPos);
+            if (FlintAndSteelItem.canSetFire(state, world, newPos)) {
+                world.setBlockState(newPos, Blocks.FIRE.getDefaultState());
+                return true;
+            } else if (FlintAndSteelItem.isUnlitCampfire(state)) {
+                world.setBlockState(newPos, state.with(BlockStateProperties.LIT, true));
+                return true;
+            } else if (state.isFlammable(world, newPos, d.getOpposite())) {
+                state.catchFire(world, pos, d.getOpposite(), null);
+                if (state.getBlock() instanceof TNTBlock) {
+                    world.removeBlock(newPos, false);
+                }
+                return true;
+            }
+            return false;
+        });
+        SuperDispenserBehaviour.registerInitial(matchesItem(Items.TNT), ITEM_STACK_SHRINK,
+                (ItemStack stack, World world, BlockPos pos, Direction d) -> {
+            BlockPos offsetPos = pos.offset(d);
+            world.addEntity(new TNTEntity(world, offsetPos.getX() + 0.5, offsetPos.getY(), offsetPos.getZ() + 0.5, null));
+            return true;
+        });
+
     }
     @SuppressWarnings("deprecation")
     public static void addDefaultEffectBehaviours () {
@@ -260,7 +412,9 @@ public class DefaultSuperDispenserBehaviour {
             entity.setFire(fireTime);
         }
     }
-
+    private static Predicate<ItemStack> matchesItem (Item i) {
+        return (ItemStack stack) -> stack.getItem() == i;
+    }
     private static Vec3d getOffsetSpawnVec (BlockPos pos, Direction d) {
         Vec3i vec1 = d.getDirectionVec();
         return new Vec3d(pos.getX() + POSITION_OFFSET + vec1.getX() * DIRECTION_MULT,
