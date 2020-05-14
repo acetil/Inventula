@@ -2,8 +2,10 @@ package acetil.modjam.common.block;
 
 import acetil.modjam.common.tile.EternalSpawnerTile;
 import net.minecraft.block.Block;
+import net.minecraft.block.BlockRenderType;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.SpawnerBlock;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockReader;
@@ -28,4 +30,8 @@ public class EternalSpawnerBlock extends SpawnerBlock {
         return new EternalSpawnerTile();
     }
 
+    @Override
+    public BlockRenderType getRenderType (BlockState state) {
+        return BlockRenderType.MODEL;
+    }
 }
