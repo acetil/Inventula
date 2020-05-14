@@ -18,7 +18,7 @@ import javax.annotation.Nullable;
 public class EternalSpawnerTile extends TileEntity implements ITickableTileEntity {
     // Based on MobSpawnerTileEntity (can't simply override because no TileEntityType constructor
     // TODO: Rewrite
-    private AbstractSpawner spawner = new AbstractEternalSpawner() {
+    private AbstractEternalSpawner spawner = new AbstractEternalSpawner() {
 
         @Override
         public void broadcastEvent (int id) {
@@ -81,5 +81,8 @@ public class EternalSpawnerTile extends TileEntity implements ITickableTileEntit
     @Override
     public boolean onlyOpsCanSetNbt () {
         return true;
+    }
+    public void setActivated (boolean activated) {
+        spawner.setIsActivated(activated);
     }
 }
