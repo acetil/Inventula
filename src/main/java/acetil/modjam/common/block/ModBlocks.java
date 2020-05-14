@@ -1,6 +1,7 @@
 package acetil.modjam.common.block;
 
 import acetil.modjam.common.constants.Constants;
+import acetil.modjam.common.tile.EternalSpawnerTile;
 import acetil.modjam.common.tile.SuperDispenserTile;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
@@ -18,10 +19,16 @@ public class ModBlocks {
 
     public static RegistryObject<Block> SUPER_DISPENSER = BLOCKS.register("super_dispenser",
             () -> new SuperDispenserBlock(Block.Properties.create(Material.ROCK)));
+    public static RegistryObject<Block> ETERNAL_SPAWNER = BLOCKS.register("eternal_spawner",
+            () -> new EternalSpawnerBlock(Block.Properties.create(Material.ROCK)));
 
     private static RegistryObject<Item> SUPER_DISPENSER_ITEM = ITEMS.register("super_dispenser",
             () -> new BlockItem(SUPER_DISPENSER.get(), new Item.Properties()));
+    private static RegistryObject<Item> ETERNAL_SPAWNER_ITEM = ITEMS.register("eternal_spawner",
+            () -> new BlockItem(ETERNAL_SPAWNER.get(), new Item.Properties()));
 
     public static RegistryObject<TileEntityType<?>> SUPER_DISPENSER_TILE = TILE_ENTITIES.register("super_dispenser",
             () -> TileEntityType.Builder.create(SuperDispenserTile::new, SUPER_DISPENSER.get()).build(null));
+    public static RegistryObject<TileEntityType<?>> ETERNAL_SPAWNER_TILE = TILE_ENTITIES.register("eternal_spawner",
+            () -> TileEntityType.Builder.create(EternalSpawnerTile::new, ETERNAL_SPAWNER.get()).build(null));
 }
