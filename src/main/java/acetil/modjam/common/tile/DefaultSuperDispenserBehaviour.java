@@ -39,6 +39,7 @@ import net.minecraftforge.event.ForgeEventFactory;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.core.jmx.Server;
 
 import javax.annotation.Nullable;
 import java.util.List;
@@ -302,7 +303,7 @@ public class DefaultSuperDispenserBehaviour {
             BlockState state = world.getBlockState(pos);
             if (stack.getItem().getToolTypes(stack).contains(state.getHarvestTool()) &&
                     !(stack.getItem() instanceof PickaxeItem && !stack.canHarvestBlock(state))) {
-                Block.spawnDrops(state, world, pos, null, null, stack);
+                Block.spawnDrops(state, world, pos, null, FakePlayerFactory.getMinecraft((ServerWorld) world), stack);
                 SoundType soundType = state.getSoundType();
                 world.playSound(pos.getX(), pos.getY(), pos.getZ(), soundType.getBreakSound(),
                         SoundCategory.BLOCKS, soundType.getVolume(), soundType.getPitch(), false);
@@ -414,7 +415,7 @@ public class DefaultSuperDispenserBehaviour {
             }
             return false;
         });
-        SuperDispenserBehaviour.registerEntity((ItemStack stack) -> stack.getItem() == Items.BUCKET, DESTROY,
+        SuperDispenserBehaviour.registerEntity(matchesItem(Items.BUCKET), DESTROY,
                 (ItemStack stack, Entity entity, Direction d) -> {
             if (entity.getType() == EntityType.COW && !((CowEntity)entity).isChild()) {
                 // no way of getting around this unfortunately. Probably have to add modded cow entities manually
