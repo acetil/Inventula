@@ -26,7 +26,6 @@ public class ModBlocks {
             () -> new BlockItem(SUPER_DISPENSER.get(), new Item.Properties()));
     private static RegistryObject<Item> ETERNAL_SPAWNER_ITEM = ITEMS.register("eternal_spawner",
             () -> new BlockItem(ETERNAL_SPAWNER.get(), new Item.Properties()));
-
     public static RegistryObject<TileEntityType<?>> SUPER_DISPENSER_TILE = TILE_ENTITIES.register("super_dispenser",
             () -> TileEntityType.Builder.create(SuperDispenserTile::new, SUPER_DISPENSER.get()).build(null));
     public static RegistryObject<TileEntityType<EternalSpawnerTile>> ETERNAL_SPAWNER_TILE = TILE_ENTITIES.register("eternal_spawner",

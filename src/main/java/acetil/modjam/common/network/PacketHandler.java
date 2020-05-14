@@ -15,6 +15,7 @@ public class PacketHandler {
                 DispenserEntitySpawnMessage::new, DispenserEntitySpawnMessage::handlePacket);
         INSTANCE.registerMessage(id++, DispenserParticleRemoveMessage.class, DispenserParticleRemoveMessage::writePacket,
                 DispenserParticleRemoveMessage::new, DispenserParticleRemoveMessage::handlePacket);
-
+        INSTANCE.registerMessage(id++, SpawnerChangeActivationMessage.class, SpawnerChangeActivationMessage::writePacket,
+                SpawnerChangeActivationMessage::new, SpawnerChangeActivationMessage::handlePacket);
     }
 }

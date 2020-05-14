@@ -2,6 +2,8 @@ package acetil.modjam.common.tile;
 
 import acetil.modjam.common.ModJam;
 import acetil.modjam.common.block.ModBlocks;
+import acetil.modjam.common.network.PacketHandler;
+import acetil.modjam.common.network.SpawnerChangeActivationMessage;
 import net.minecraft.client.renderer.texture.ITickable;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.play.server.SUpdateTileEntityPacket;
@@ -11,6 +13,7 @@ import net.minecraft.tileentity.TileEntityType;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.spawner.AbstractSpawner;
+import net.minecraftforge.fml.network.PacketDistributor;
 import org.apache.logging.log4j.Level;
 
 import javax.annotation.Nullable;
@@ -48,12 +51,16 @@ public class EternalSpawnerTile extends TileEntity implements ITickableTileEntit
     public void read (CompoundNBT compound) {
         super.read(compound);
         spawner.read(compound);
+        if (compound.contains("activated")) {
+            spawner.setIsActivated(compound.getBoolean("activated"));
+        }
     }
 
     @Override
     public CompoundNBT write (CompoundNBT compound) {
         super.write(compound);
         spawner.write(compound);
+        compound.putBoolean("activated", spawner.isActivated());
         return compound;
     }
     public AbstractSpawner getSpawnerLogic () {
@@ -83,6 +90,11 @@ public class EternalSpawnerTile extends TileEntity implements ITickableTileEntit
         return true;
     }
     public void setActivated (boolean activated) {
+        if (activated != spawner.isActivated() && !world.isRemote()) {
+            PacketHandler.INSTANCE.send(PacketDistributor.TRACKING_CHUNK.with(() -> world.getChunkAt(pos)),
+                    new SpawnerChangeActivationMessage(pos, activated));
+            ModJam.LOGGER.log(Level.DEBUG, "Sent message");
+        }
         spawner.setIsActivated(activated);
     }
 }
