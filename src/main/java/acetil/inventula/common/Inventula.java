@@ -4,6 +4,7 @@ import acetil.inventula.client.ClientEvents;
 import acetil.inventula.client.ClientSetup;
 import acetil.inventula.common.block.ModBlocks;
 import acetil.inventula.common.constants.Constants;
+import acetil.inventula.common.containers.ModContainers;
 import acetil.inventula.common.entity.ModEntities;
 import acetil.inventula.common.item.ModItems;
 import acetil.inventula.common.network.PacketHandler;
@@ -69,5 +70,7 @@ public class Inventula {
         ModEntities.ENTITIES.register(FMLJavaModLoadingContext.get().getModEventBus());
 
         ModParticles.PARTICLES.register(FMLJavaModLoadingContext.get().getModEventBus());
+
+        ModContainers.CONTAINERS.register(FMLJavaModLoadingContext.get().getModEventBus());
     }
 }

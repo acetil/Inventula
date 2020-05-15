@@ -1,19 +1,34 @@
 package acetil.inventula.common.block;
 
+import acetil.inventula.common.Inventula;
+import acetil.inventula.common.containers.SuperDispenserContainer;
 import acetil.inventula.common.tile.SuperDispenserTile;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.entity.player.ServerPlayerEntity;
+import net.minecraft.inventory.container.Container;
+import net.minecraft.inventory.container.DispenserContainer;
+import net.minecraft.inventory.container.INamedContainerProvider;
 import net.minecraft.item.BlockItemUseContext;
 import net.minecraft.state.BooleanProperty;
 import net.minecraft.state.DirectionProperty;
 import net.minecraft.state.StateContainer;
 import net.minecraft.state.properties.BlockStateProperties;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Direction;
+import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.BlockRayTraceResult;
+import net.minecraft.util.text.ITextComponent;
 import net.minecraft.world.IBlockReader;
 import net.minecraft.world.World;
+import net.minecraftforge.fml.network.NetworkHooks;
+import net.minecraftforge.items.CapabilityItemHandler;
+import net.minecraftforge.items.IItemHandler;
+import org.apache.logging.log4j.Level;
 
 import javax.annotation.Nullable;
 
@@ -44,9 +59,31 @@ public class SuperDispenserBlock extends Block {
 
     @SuppressWarnings("deprecation")
     @Override
-    public void onBlockClicked (BlockState state, World worldIn, BlockPos pos, PlayerEntity player) {
-        // do gui stuff
-        super.onBlockClicked(state, worldIn, pos, player);
+    public ActionResultType onBlockActivated (BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult hit) {
+        if (worldIn.isRemote()) {
+            return ActionResultType.SUCCESS;
+        }
+        TileEntity te = worldIn.getTileEntity(pos);
+        if (!(te instanceof SuperDispenserTile)) {
+            Inventula.LOGGER.log(Level.WARN, "Dispenser at {} has wrong tile entity!", pos);
+            return ActionResultType.FAIL;
+        }
+        ITextComponent localisedName = this.getNameTextComponent();
+        NetworkHooks.openGui((ServerPlayerEntity) player, new INamedContainerProvider() {
+            @Override
+            public ITextComponent getDisplayName () {
+                return localisedName;
+            }
+
+            @Nullable
+            @Override
+            public Container createMenu (int windowId, PlayerInventory inv, PlayerEntity entity) {
+                IItemHandler handler = te.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY)
+                        .orElseGet(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY::getDefaultInstance);
+                return new SuperDispenserContainer(windowId, inv, handler, pos);
+            }
+        }, pos);
+        return super.onBlockActivated(state, worldIn, pos, player, handIn, hit);
     }
 
     @Override

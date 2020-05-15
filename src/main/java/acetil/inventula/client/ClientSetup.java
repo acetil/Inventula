@@ -1,5 +1,6 @@
 package acetil.inventula.client;
 
+import acetil.inventula.client.gui.ModGuis;
 import acetil.inventula.client.particle.DispenserItemParticle;
 import acetil.inventula.client.renderer.DispenserItemRenderer;
 import acetil.inventula.common.entity.ModEntities;
@@ -14,6 +15,7 @@ public class ClientSetup {
     public static void setup (final FMLClientSetupEvent event) {
         RenderingRegistry.registerEntityRenderingHandler(ModEntities.DISPENSER_ITEM_ENTITY.get(), (EntityRendererManager m) ->
                 new DispenserItemRenderer(m, Minecraft.getInstance().getItemRenderer()));
+        ModGuis.registerGuis();
         //ClientRegistry.bindTileEntityRenderer(ModBlocks.ETERNAL_SPAWNER_TILE.get(), EternalSpawnerRenderer::new);
         //CapabilityParticleTracker.register();
     }
