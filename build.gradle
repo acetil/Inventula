@@ -14,8 +14,8 @@ apply plugin: 'eclipse'
 apply plugin: 'maven-publish'
 
 version = '1.0'
-group = 'acetil.modjam' // http://maven.apache.org/guides/mini/guide-naming-conventions.html
-archivesBaseName = 'modjam'
+group = 'acetil.inventula' // http://maven.apache.org/guides/mini/guide-naming-conventions.html
+archivesBaseName = 'inventula'
 
 sourceCompatibility = targetCompatibility = compileJava.sourceCompatibility = compileJava.targetCompatibility = '1.8' // Need this here so eclipse task generates correctly.
 
@@ -74,7 +74,7 @@ minecraft {
             // Recommended logging level for the console
             property 'forge.logging.console.level', 'debug'
 
-            args '--mod', 'modjam', '--all', '--output', file('src/generated/resources/')
+            args '--mod', 'inventula', '--all', '--output', file('src/generated/resources/')
 
             mods {
                 modjam {
@@ -115,7 +115,7 @@ dependencies {
 jar {
     manifest {
         attributes([
-            "Specification-Title": "modjam",
+            "Specification-Title": "inventula",
             "Specification-Vendor": "acetil",
             "Specification-Version": "1", // We are version 1 of ourselves
             "Implementation-Title": project.name,

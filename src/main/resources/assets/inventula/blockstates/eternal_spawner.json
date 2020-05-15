@@ -1,0 +1,7 @@
+{
+  "variants" : {
+    "" : {
+      "model" : "inventula:block/eternal_spawner"
+    }
+  }
+}
