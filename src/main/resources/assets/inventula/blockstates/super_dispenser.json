@@ -1,0 +1,27 @@
+{
+  "variants" : {
+    "facing=down" : {
+      "model": "inventula:block/super_dispenser",
+      "x" : 90
+    },
+    "facing=up" : {
+      "model": "inventula:block/super_dispenser",
+      "x" : 270
+    },
+    "facing=north" : {
+      "model" : "inventula:block/super_dispenser"
+    },
+    "facing=south" : {
+      "model": "inventula:block/super_dispenser",
+      "y" : 180
+    },
+    "facing=east" : {
+      "model": "inventula:block/super_dispenser",
+      "y": 90
+    },
+    "facing=west" : {
+      "model": "inventula:block/super_dispenser",
+      "y" : 270
+    }
+  }
+}

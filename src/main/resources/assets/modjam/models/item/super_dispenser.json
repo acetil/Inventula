@@ -1,8 +1,0 @@
-{
-  "parent" : "block/orientable",
-  "textures" : {
-    "top" : "minecraft:block/furnace_top",
-    "front" : "modjam:block/super_dispenser_front",
-    "side" : "minecraft:block/furnace_side"
-  }
-}
