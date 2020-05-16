@@ -11,6 +11,8 @@ import acetil.inventula.common.item.ModItems;
 import acetil.inventula.common.network.PacketHandler;
 import acetil.inventula.common.particle.ModParticles;
 import acetil.inventula.common.tile.DefaultSuperDispenserBehaviour;
+import net.minecraft.item.ItemGroup;
+import net.minecraft.item.ItemStack;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
@@ -27,7 +29,12 @@ import org.apache.logging.log4j.Logger;
 @Mod(Constants.MODID)
 public class Inventula {
     public static final Logger LOGGER = LogManager.getLogger();
-
+    public static final ItemGroup CUSTOM_ITEM_GROUP = new ItemGroup(Constants.MODID) {
+        @Override
+        public ItemStack createIcon () {
+            return new ItemStack(ModBlocks.CRAFTING_DROPPER_ITEM.get());
+        }
+    };
     public Inventula () {
         // Register the setup method for modloading
         FMLJavaModLoadingContext.get().getModEventBus().addListener(this::setup);

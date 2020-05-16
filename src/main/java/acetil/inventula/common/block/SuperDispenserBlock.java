@@ -12,6 +12,7 @@ import net.minecraft.inventory.container.Container;
 import net.minecraft.inventory.container.DispenserContainer;
 import net.minecraft.inventory.container.INamedContainerProvider;
 import net.minecraft.item.BlockItemUseContext;
+import net.minecraft.item.ItemStack;
 import net.minecraft.state.BooleanProperty;
 import net.minecraft.state.DirectionProperty;
 import net.minecraft.state.StateContainer;
@@ -109,5 +110,23 @@ public class SuperDispenserBlock extends Block {
         } else if (!worldIn.isBlockPowered(pos) && state.get(POWERED)) {
             worldIn.setBlockState(pos, state.with(POWERED, false));
         }
+    }
+
+    @SuppressWarnings("deprecation")
+    @Override
+    public void onReplaced (BlockState state, World worldIn, BlockPos pos, BlockState newState, boolean isMoving) {
+        System.out.println("On replaced!");
+        if (state.hasTileEntity() && state.getBlock() != newState.getBlock()) {
+            IItemHandler handler = worldIn.getTileEntity(pos)
+                    .getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY)
+                    .orElse(null);
+            for (int i = 0; i < handler.getSlots(); i++) {
+                if (handler.getStackInSlot(i) != ItemStack.EMPTY) {
+                    spawnAsEntity(worldIn, pos, handler.getStackInSlot(i));
+                }
+            }
+            worldIn.updateComparatorOutputLevel(pos, this);
+        }
+        super.onReplaced(state, worldIn, pos, newState, isMoving);
     }
 }

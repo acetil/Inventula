@@ -22,6 +22,8 @@ import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.world.IBlockReader;
 import net.minecraft.world.IWorldReader;
 import net.minecraft.world.World;
+import net.minecraftforge.items.CapabilityItemHandler;
+import net.minecraftforge.items.IItemHandler;
 import org.apache.logging.log4j.Level;
 
 import javax.annotation.Nullable;
@@ -96,5 +98,21 @@ public class CraftingDropperBlock extends Block {
     @Override
     public BlockRenderType getRenderType (BlockState state) {
         return BlockRenderType.MODEL;
+    }
+    @SuppressWarnings("deprecation")
+    @Override
+    public void onReplaced (BlockState state, World worldIn, BlockPos pos, BlockState newState, boolean isMoving) {
+        if (state.hasTileEntity() && state.getBlock() != newState.getBlock()) {
+            IItemHandler handler = worldIn.getTileEntity(pos)
+                    .getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY)
+                    .orElse(null);
+            for (int i = 0; i < handler.getSlots(); i++) {
+                if (handler.getStackInSlot(i) != ItemStack.EMPTY) {
+                    spawnAsEntity(worldIn, pos, handler.getStackInSlot(i));
+                }
+            }
+            worldIn.updateComparatorOutputLevel(pos, this);
+        }
+        super.onReplaced(state, worldIn, pos, newState, isMoving);
     }
 }

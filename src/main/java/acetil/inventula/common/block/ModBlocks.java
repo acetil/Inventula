@@ -1,5 +1,6 @@
 package acetil.inventula.common.block;
 
+import acetil.inventula.common.Inventula;
 import acetil.inventula.common.constants.Constants;
 import acetil.inventula.common.tile.CraftingDropperTile;
 import acetil.inventula.common.tile.EternalSpawnerTile;
@@ -26,11 +27,11 @@ public class ModBlocks {
             () -> new CraftingDropperBlock(Block.Properties.create(Material.ROCK).notSolid().variableOpacity()));
 
     private static RegistryObject<Item> SUPER_DISPENSER_ITEM = ITEMS.register("super_dispenser",
-            () -> new BlockItem(SUPER_DISPENSER.get(), new Item.Properties()));
+            () -> new BlockItem(SUPER_DISPENSER.get(), new Item.Properties().group(Inventula.CUSTOM_ITEM_GROUP)));
     private static RegistryObject<Item> ETERNAL_SPAWNER_ITEM = ITEMS.register("eternal_spawner",
             () -> new BlockItem(ETERNAL_SPAWNER.get(), new Item.Properties()));
-    private static RegistryObject<Item> CRAFTING_DROPPER_ITEM = ITEMS.register("crafting_dropper",
-            () -> new BlockItem(CRAFTING_DROPPER.get(), new Item.Properties()));
+    public static RegistryObject<Item> CRAFTING_DROPPER_ITEM = ITEMS.register("crafting_dropper",
+            () -> new BlockItem(CRAFTING_DROPPER.get(), new Item.Properties().group(Inventula.CUSTOM_ITEM_GROUP)));
 
     public static RegistryObject<TileEntityType<?>> SUPER_DISPENSER_TILE = TILE_ENTITIES.register("super_dispenser",
             () -> TileEntityType.Builder.create(SuperDispenserTile::new, SUPER_DISPENSER.get()).build(null));
