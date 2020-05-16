@@ -1,8 +1,22 @@
 {
-  "parent" : "block/orientable",
+  "parent" : "block/block",
   "textures" : {
-    "top" : "minecraft:block/furnace_top",
+    "particle" : "inventula:block/super_dispenser_front",
+    "back" : "minecraft:block/furnace_top",
     "front" : "inventula:block/super_dispenser_front",
-    "side" : "minecraft:block/furnace_side"
-  }
+    "side" : "inventula:block/super_dispenser_side"
+  },"elements" : [
+  {
+    "from": [0, 0, 0],
+    "to": [16, 16, 16],
+      "faces": {
+        "down": {"texture" : "#side", "cullface" : "down", "rotation" : 270},
+        "up": {"texture" : "#side", "cullface" : "up", "rotation" : 90},
+        "north": {"texture" : "#front", "cullface" : "north"},
+        "south": {"texture" : "#back", "cullface" : "south"},
+        "east": {"texture" : "#side", "cullface" : "east", "rotation" : 180},
+        "west": {"texture" : "#side", "cullface" : "west"}
+      }
+    }
+  ]
 }
