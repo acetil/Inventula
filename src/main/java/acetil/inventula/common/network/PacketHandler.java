@@ -1,6 +1,7 @@
 package acetil.inventula.common.network;
 
 import acetil.inventula.common.constants.Constants;
+import net.minecraft.network.INetHandler;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.network.NetworkRegistry;
 import net.minecraftforge.fml.network.simple.SimpleChannel;
@@ -16,5 +17,7 @@ public class PacketHandler {
                 DispenserParticleRemoveMessage::new, DispenserParticleRemoveMessage::handlePacket);
         INSTANCE.registerMessage(id++, SpawnerChangeActivationMessage.class, SpawnerChangeActivationMessage::writePacket,
                 SpawnerChangeActivationMessage::new, SpawnerChangeActivationMessage::handlePacket);
+        INSTANCE.registerMessage(id++, CrafterItemSlotChangeMessage.class, CrafterItemSlotChangeMessage::writePacket,
+                CrafterItemSlotChangeMessage::new, CrafterItemSlotChangeMessage::handleMessage);
     }
 }

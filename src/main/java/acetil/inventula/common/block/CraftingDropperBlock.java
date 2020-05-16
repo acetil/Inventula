@@ -3,6 +3,7 @@ package acetil.inventula.common.block;
 import acetil.inventula.common.Inventula;
 import acetil.inventula.common.tile.CraftingDropperTile;
 import net.minecraft.block.Block;
+import net.minecraft.block.BlockRenderType;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.EquipmentSlotType;
@@ -90,5 +91,10 @@ public class CraftingDropperBlock extends Block {
             Inventula.LOGGER.log(Level.WARN, "Crafting dropper block at {} has wrong tile entity!", pos);
         }
         return ActionResultType.SUCCESS;
+    }
+
+    @Override
+    public BlockRenderType getRenderType (BlockState state) {
+        return BlockRenderType.MODEL;
     }
 }

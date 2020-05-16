@@ -1,7 +1,10 @@
 package acetil.inventula.common.tile;
 
 import acetil.inventula.common.Inventula;
+import acetil.inventula.common.block.CraftingDropperBlock;
 import acetil.inventula.common.block.ModBlocks;
+import acetil.inventula.common.network.CrafterItemSlotChangeMessage;
+import acetil.inventula.common.network.PacketHandler;
 import acetil.inventula.common.util.VecHelp;
 import com.sun.javafx.geom.Vec2d;
 import net.minecraft.entity.item.ItemEntity;
@@ -11,6 +14,8 @@ import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.item.crafting.IRecipeType;
 import net.minecraft.item.crafting.RecipeManager;
 import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.network.NetworkManager;
+import net.minecraft.network.play.server.SUpdateTileEntityPacket;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.tileentity.TileEntityType;
@@ -25,6 +30,7 @@ import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.crafting.CraftingHelper;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.common.util.RecipeMatcher;
+import net.minecraftforge.fml.network.PacketDistributor;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.ItemStackHandler;
@@ -42,9 +48,11 @@ public class CraftingDropperTile extends TileEntity {
     private static final double DROP_SPEED = 0.2;
     private static final double POSITION_OFFSET = 0.5;
     private static final double DIRECTION_MULT = 0.6;
-    ItemStackHandler itemHandler;
-    MaskedItemHandler maskedHandler;
-    LazyOptional<IItemHandler> itemHandlerOptional;
+    private ItemStackHandler itemHandler;
+    private MaskedItemHandler maskedHandler;
+    private LazyOptional<IItemHandler> itemHandlerOptional;
+    private Direction direction;
+    private boolean gotDirection = false;
     boolean[] maskedSlots = new boolean[9];
     public CraftingDropperTile () {
         super(ModBlocks.CRAFTING_DROPPER_TILE.get());
@@ -53,6 +61,10 @@ public class CraftingDropperTile extends TileEntity {
             protected void onContentsChanged (int slot) {
                 super.onContentsChanged(slot);
                 CraftingDropperTile.this.markDirty();
+                if (!world.isRemote) {
+                    PacketHandler.INSTANCE.send(PacketDistributor.TRACKING_CHUNK.with(() -> world.getChunkAt(pos)),
+                            new CrafterItemSlotChangeMessage(slot, getStackInSlot(slot), pos));
+                }
             }
         };
         maskedHandler = new MaskedItemHandler(itemHandler);
@@ -61,6 +73,28 @@ public class CraftingDropperTile extends TileEntity {
             maskedSlots[i] = false;
         }
     }
+
+    @Override
+    public CompoundNBT getUpdateTag () {
+        return write(super.getUpdateTag());
+    }
+
+    @Nullable
+    @Override
+    public SUpdateTileEntityPacket getUpdatePacket () {
+        return new SUpdateTileEntityPacket(pos, 1, write(new CompoundNBT()));
+    }
+
+    @Override
+    public void handleUpdateTag (CompoundNBT tag) {
+        read(tag);
+    }
+
+    @Override
+    public void onDataPacket (NetworkManager net, SUpdateTileEntityPacket pkt) {
+        read(pkt.getNbtCompound());
+    }
+
     public void craft (Direction d) {
         CraftingWrapper wrapper = new CraftingWrapper(itemHandler);
         Optional<ICraftingRecipe> recipeOp = world.getRecipeManager().getRecipe(IRecipeType.CRAFTING,
@@ -128,6 +162,20 @@ public class CraftingDropperTile extends TileEntity {
             maskedSlots[slot] = true;
             Inventula.LOGGER.log(Level.DEBUG, "Masked slot {}", slot);
         }
+    }
+    public void setDirection () {
+        this.direction = world.getBlockState(pos).get(CraftingDropperBlock.FACING);
+        System.out.println("Set direction! Direction: " + direction);
+    }
+    public Direction getDirection () {
+        if (!gotDirection) {
+            setDirection();
+            gotDirection = true;
+        }
+        return direction;
+    }
+    public void setStackInSlot (int slot, ItemStack stack) {
+        itemHandler.setStackInSlot(slot, stack);
     }
     @Override
     public void read (CompoundNBT compound) {

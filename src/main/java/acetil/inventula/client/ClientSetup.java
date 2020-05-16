@@ -2,12 +2,15 @@ package acetil.inventula.client;
 
 import acetil.inventula.client.gui.ModGuis;
 import acetil.inventula.client.particle.DispenserItemParticle;
+import acetil.inventula.client.renderer.CraftingDropperRenderer;
 import acetil.inventula.client.renderer.DispenserItemRenderer;
+import acetil.inventula.common.block.ModBlocks;
 import acetil.inventula.common.entity.ModEntities;
 import acetil.inventula.common.particle.ModParticles;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.entity.EntityRendererManager;
 import net.minecraftforge.client.event.ParticleFactoryRegisterEvent;
+import net.minecraftforge.fml.client.registry.ClientRegistry;
 import net.minecraftforge.fml.client.registry.RenderingRegistry;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 
@@ -16,6 +19,7 @@ public class ClientSetup {
         RenderingRegistry.registerEntityRenderingHandler(ModEntities.DISPENSER_ITEM_ENTITY.get(), (EntityRendererManager m) ->
                 new DispenserItemRenderer(m, Minecraft.getInstance().getItemRenderer()));
         ModGuis.registerGuis();
+        ClientRegistry.bindTileEntityRenderer(ModBlocks.CRAFTING_DROPPER_TILE.get(), CraftingDropperRenderer::new);
         //ClientRegistry.bindTileEntityRenderer(ModBlocks.ETERNAL_SPAWNER_TILE.get(), EternalSpawnerRenderer::new);
         //CapabilityParticleTracker.register();
     }

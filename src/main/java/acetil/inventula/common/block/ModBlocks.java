@@ -21,9 +21,9 @@ public class ModBlocks {
     public static RegistryObject<Block> SUPER_DISPENSER = BLOCKS.register("super_dispenser",
             () -> new SuperDispenserBlock(Block.Properties.create(Material.ROCK)));
     public static RegistryObject<Block> ETERNAL_SPAWNER = BLOCKS.register("eternal_spawner",
-            () -> new EternalSpawnerBlock(Block.Properties.create(Material.ROCK).notSolid()));
+            () -> new EternalSpawnerBlock(Block.Properties.create(Material.ROCK).notSolid().variableOpacity()));
     public static RegistryObject<Block> CRAFTING_DROPPER = BLOCKS.register("crafting_dropper",
-            () -> new CraftingDropperBlock(Block.Properties.create(Material.ROCK)));
+            () -> new CraftingDropperBlock(Block.Properties.create(Material.ROCK).notSolid().variableOpacity()));
 
     private static RegistryObject<Item> SUPER_DISPENSER_ITEM = ITEMS.register("super_dispenser",
             () -> new BlockItem(SUPER_DISPENSER.get(), new Item.Properties()));
@@ -36,6 +36,6 @@ public class ModBlocks {
             () -> TileEntityType.Builder.create(SuperDispenserTile::new, SUPER_DISPENSER.get()).build(null));
     public static RegistryObject<TileEntityType<EternalSpawnerTile>> ETERNAL_SPAWNER_TILE = TILE_ENTITIES.register("eternal_spawner",
             () -> TileEntityType.Builder.create(EternalSpawnerTile::new, ETERNAL_SPAWNER.get()).build(null));
-    public static RegistryObject<TileEntityType<?>> CRAFTING_DROPPER_TILE = TILE_ENTITIES.register("crafting_dropper",
+    public static RegistryObject<TileEntityType<CraftingDropperTile>> CRAFTING_DROPPER_TILE = TILE_ENTITIES.register("crafting_dropper",
             () -> TileEntityType.Builder.create(CraftingDropperTile::new, CRAFTING_DROPPER.get()).build(null));
 }
