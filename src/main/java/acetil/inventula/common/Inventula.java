@@ -2,6 +2,7 @@ package acetil.inventula.common;
 
 import acetil.inventula.client.ClientEvents;
 import acetil.inventula.client.ClientSetup;
+import acetil.inventula.client.ParticleSetup;
 import acetil.inventula.common.block.ModBlocks;
 import acetil.inventula.common.constants.ConfigConstants;
 import acetil.inventula.common.constants.Constants;
@@ -44,13 +45,14 @@ public class Inventula {
         FMLJavaModLoadingContext.get().getModEventBus().addListener(this::processIMC);
         // Register the doClientStuff method for modloading
         FMLJavaModLoadingContext.get().getModEventBus().addListener(this::clientSetup);
-        ClientEvents.registerEvents(FMLJavaModLoadingContext.get().getModEventBus());
+
         FMLJavaModLoadingContext.get().getModEventBus().addListener(ClientEvents::attachCapabilities);
         // Register ourselves for server and other game events we are interested in
         MinecraftForge.EVENT_BUS.register(this);
         registerDefferedRegisters();
         ConfigConstants.Server.bakeConfigs();
         ModLoadingContext.get().registerConfig(ModConfig.Type.SERVER, ConfigConstants.SERVER_SPEC);
+        FMLJavaModLoadingContext.get().getModEventBus().addListener(ParticleSetup::setupParticles);
     }
 
     private void setup (final FMLCommonSetupEvent event) {

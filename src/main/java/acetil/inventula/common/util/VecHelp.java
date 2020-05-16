@@ -14,7 +14,7 @@ public class VecHelp {
         Vec3d projVec = hitVec.subtract(VecHelp.project(hitVec, dVec));
         Vec2d finalVec;
         if (d.getAxis() == Direction.Axis.X) {
-            finalVec = new Vec2d(projVec.getZ() * -1 * dVec.getX() + (1 + dVec.getX()) / 2, 1 - projVec.getY());
+            finalVec = new Vec2d(1 - (projVec.getZ() * -1 * dVec.getX() + (1 + dVec.getX()) / 2), 1 - projVec.getY());
         } else if (d.getAxis() == Direction.Axis.Y) {
             finalVec = new Vec2d(projVec.getX(), projVec.getZ() * -1 * dVec.getY() + (1 + dVec.getY()) / 2);
         } else {

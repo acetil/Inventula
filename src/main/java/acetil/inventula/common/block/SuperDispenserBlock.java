@@ -1,8 +1,10 @@
 package acetil.inventula.common.block;
 
 import acetil.inventula.common.Inventula;
+import acetil.inventula.common.constants.Constants;
 import acetil.inventula.common.containers.SuperDispenserContainer;
 import acetil.inventula.common.tile.SuperDispenserTile;
+import com.sun.java.accessibility.util.java.awt.TextComponentTranslator;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.player.PlayerEntity;
@@ -24,6 +26,8 @@ import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.TextComponentUtils;
+import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.IBlockReader;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.network.NetworkHooks;
@@ -69,7 +73,7 @@ public class SuperDispenserBlock extends Block {
             Inventula.LOGGER.log(Level.WARN, "Dispenser at {} has wrong tile entity!", pos);
             return ActionResultType.FAIL;
         }
-        ITextComponent localisedName = this.getNameTextComponent();
+        ITextComponent localisedName = new TranslationTextComponent(getTranslationKey());
         NetworkHooks.openGui((ServerPlayerEntity) player, new INamedContainerProvider() {
             @Override
             public ITextComponent getDisplayName () {
@@ -84,7 +88,7 @@ public class SuperDispenserBlock extends Block {
                 return new SuperDispenserContainer(windowId, inv, handler, pos);
             }
         }, pos);
-        return super.onBlockActivated(state, worldIn, pos, player, handIn, hit);
+        return ActionResultType.SUCCESS;
     }
 
     @Override
