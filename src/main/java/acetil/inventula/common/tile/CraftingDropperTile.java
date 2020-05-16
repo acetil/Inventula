@@ -103,7 +103,6 @@ public class CraftingDropperTile extends TileEntity {
         if (recipeOp.isPresent()) {
             ICraftingRecipe recipe = recipeOp.get();
             ItemStack stack = recipe.getCraftingResult(wrapper);
-            Inventula.LOGGER.log(Level.DEBUG, "Recipe! Item = {}", stack);
             NonNullList<ItemStack> remaining = recipe.getRemainingItems(wrapper);
             dropItem(d, stack);
             for (ItemStack s : remaining) {
@@ -114,8 +113,10 @@ public class CraftingDropperTile extends TileEntity {
             for (int i = 0; i < itemHandler.getSlots(); i++) {
                 itemHandler.setStackInSlot(i, ItemStack.EMPTY);
             }
+            world.playEvent(1000, pos, 0);
+            world.playEvent(2000, pos, d.getIndex());
         } else {
-            Inventula.LOGGER.log(Level.DEBUG, "No recipe!");
+            world.playEvent(1001, pos, 0);
         }
     }
     public void clearItems (Direction d) {
@@ -125,7 +126,6 @@ public class CraftingDropperTile extends TileEntity {
         }
     }
     public void dropItem (Direction d, ItemStack stack) {
-        Inventula.LOGGER.log(Level.DEBUG, "Dropping item {} in direction {}", stack, d);
         TileEntity te = world.getTileEntity(pos.offset(d));
         ItemStack stack1 = stack;
         if (te != null) {

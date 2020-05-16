@@ -118,6 +118,9 @@ public class DefaultSuperDispenserBehaviour {
             };
     public static void addDefaultInitialBehaviours () {
         Inventula.LOGGER.log(Level.INFO, "Adding default initial dispenser behaviours!");
+        SuperDispenserBehaviour.registerInitial((ItemStack stack) -> stack == ItemStack.EMPTY, NO_CHANGE,
+                (ItemStack stack, World world, BlockPos pos, Direction direction) -> world.playEvent(1001, pos, 0),
+                (ItemStack stack, World world, BlockPos pos, Direction direction) -> true);
         SuperDispenserBehaviour.registerInitial(MATCH_NOT_EMPTY, ITEM_STACK_SHRINK,
                 (ItemStack stack, World world, BlockPos pos, Direction direction) -> {
             Inventula.LOGGER.log(Level.DEBUG, "Dispensed item in direction: " + direction.getName());
