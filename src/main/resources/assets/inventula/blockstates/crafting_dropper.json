@@ -1,0 +1,27 @@
+{
+  "variants" : {
+    "facing=down" : {
+      "model": "inventula:block/crafting_dropper",
+      "x" : 90
+    },
+    "facing=up" : {
+      "model": "inventula:block/crafting_dropper",
+      "x" : 270
+    },
+    "facing=north" : {
+      "model" : "inventula:block/crafting_dropper"
+    },
+    "facing=south" : {
+      "model": "inventula:block/crafting_dropper",
+      "y" : 180
+    },
+    "facing=east" : {
+      "model": "inventula:block/crafting_dropper",
+      "y": 90
+    },
+    "facing=west" : {
+      "model": "inventula:block/crafting_dropper",
+      "y" : 270
+    }
+  }
+}

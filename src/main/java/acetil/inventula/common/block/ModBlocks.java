@@ -1,6 +1,7 @@
 package acetil.inventula.common.block;
 
 import acetil.inventula.common.constants.Constants;
+import acetil.inventula.common.tile.CraftingDropperTile;
 import acetil.inventula.common.tile.EternalSpawnerTile;
 import acetil.inventula.common.tile.SuperDispenserTile;
 import net.minecraft.block.Block;
@@ -21,13 +22,20 @@ public class ModBlocks {
             () -> new SuperDispenserBlock(Block.Properties.create(Material.ROCK)));
     public static RegistryObject<Block> ETERNAL_SPAWNER = BLOCKS.register("eternal_spawner",
             () -> new EternalSpawnerBlock(Block.Properties.create(Material.ROCK).notSolid()));
+    public static RegistryObject<Block> CRAFTING_DROPPER = BLOCKS.register("crafting_dropper",
+            () -> new CraftingDropperBlock(Block.Properties.create(Material.ROCK)));
 
     private static RegistryObject<Item> SUPER_DISPENSER_ITEM = ITEMS.register("super_dispenser",
             () -> new BlockItem(SUPER_DISPENSER.get(), new Item.Properties()));
     private static RegistryObject<Item> ETERNAL_SPAWNER_ITEM = ITEMS.register("eternal_spawner",
             () -> new BlockItem(ETERNAL_SPAWNER.get(), new Item.Properties()));
+    private static RegistryObject<Item> CRAFTING_DROPPER_ITEM = ITEMS.register("crafting_dropper",
+            () -> new BlockItem(CRAFTING_DROPPER.get(), new Item.Properties()));
+
     public static RegistryObject<TileEntityType<?>> SUPER_DISPENSER_TILE = TILE_ENTITIES.register("super_dispenser",
             () -> TileEntityType.Builder.create(SuperDispenserTile::new, SUPER_DISPENSER.get()).build(null));
     public static RegistryObject<TileEntityType<EternalSpawnerTile>> ETERNAL_SPAWNER_TILE = TILE_ENTITIES.register("eternal_spawner",
             () -> TileEntityType.Builder.create(EternalSpawnerTile::new, ETERNAL_SPAWNER.get()).build(null));
+    public static RegistryObject<TileEntityType<?>> CRAFTING_DROPPER_TILE = TILE_ENTITIES.register("crafting_dropper",
+            () -> TileEntityType.Builder.create(CraftingDropperTile::new, CRAFTING_DROPPER.get()).build(null));
 }

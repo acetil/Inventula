@@ -1,0 +1,12 @@
+{
+  "parent" : "block/cube",
+  "textures" : {
+    "particle" : "inventula:block/crafting_dropper_back_wip",
+    "up" : "minecraft:block/furnace_top",
+    "down" : "minecraft:block/furnace_top",
+    "north" : "minecraft:block/dropper_front_vertical",
+    "south" : "inventula:block/crafting_dropper_back_wip",
+    "east" : "minecraft:block/furnace_top",
+    "west" : "minecraft:block/furnace_top"
+  }
+}
