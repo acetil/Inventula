@@ -313,6 +313,22 @@ public class DefaultSuperDispenserBehaviour {
                 return false;
             }
         });
+        SuperDispenserBehaviour.registerEffect(matchesItem(Items.STICK), NO_CHANGE,
+                (ItemStack stack, World world, BlockPos pos, Direction d) -> {
+            BlockState state = world.getBlockState(pos);
+            System.out.println(state.getHarvestTool());
+            if (state.getHarvestTool() == null) {
+                Block.spawnDrops(state, world, pos, null, FakePlayerFactory.getMinecraft((ServerWorld) world), stack);
+                SoundType soundType = state.getSoundType();
+                world.playSound(pos.getX(), pos.getY(), pos.getZ(), soundType.getBreakSound(),
+                        SoundCategory.BLOCKS, soundType.getVolume(), soundType.getPitch(), false);
+                world.playEvent(BLOCK_DESTRUCTION_ID, pos, Block.getStateId(state));
+                world.setBlockState(pos, Blocks.AIR.getDefaultState());
+                return true;
+            } else {
+                return false;
+            }
+        });
         SuperDispenserBehaviour.registerEffect((ItemStack stack) -> stack.getItem() instanceof HoeItem, DEGRADE,
                 (ItemStack stack, World world, BlockPos pos, Direction d) -> {
             int hook = ForgeEventFactory.onHoeUse(new CustomBlockItemUseContext(world, stack, pos, d));
