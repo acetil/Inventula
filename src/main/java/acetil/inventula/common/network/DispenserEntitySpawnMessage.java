@@ -53,7 +53,6 @@ public class DispenserEntitySpawnMessage {
         //buf.writeUniqueId(uuid);
     }
     public void handlePacket (Supplier<NetworkEvent.Context> ctx) {
-        Inventula.LOGGER.log(Level.DEBUG, "Handling spawn packet at {}!", System.currentTimeMillis());
         ctx.get().enqueueWork(() -> {
            ClientWorld world = Minecraft.getInstance().world;
            /*DispenserItemEntity entity = new DispenserItemEntity(ModEntities.DISPENSER_ITEM_ENTITY.get(), world);
@@ -64,7 +63,6 @@ public class DispenserEntitySpawnMessage {
            world.addEntity(entityId, entity);*/
             world.addParticle(new DispenserItemParticleData(stack, lifetime, entityId), true, spawnPos.getX(), spawnPos.getY(), spawnPos.getZ(),
                     initialVel.getX(), initialVel.getY(), initialVel.getZ());
-           Inventula.LOGGER.log(Level.DEBUG, "Spawning particle at {}. Pos: ({}, {}, {})", System.currentTimeMillis(), spawnPos.getX(), spawnPos.getY(), spawnPos.getZ());
 
         });
         ctx.get().setPacketHandled(true);

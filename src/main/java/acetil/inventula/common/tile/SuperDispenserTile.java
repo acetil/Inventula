@@ -65,7 +65,6 @@ public class SuperDispenserTile extends TileEntity {
     }
 
     public void dispense (Direction direction) {
-        System.out.println("Dispense in direction: " + direction.getName());
         int slot = getDispenseSlot();
         itemHandler.setStackInSlot(slot,
                 SuperDispenserBehaviour.evaluateInitial(itemHandler.getStackInSlot(slot), world, getPos(), direction, doContinue));

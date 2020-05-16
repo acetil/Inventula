@@ -87,8 +87,6 @@ public class DispenserItemEntity extends ProjectileItemEntity {
             BlockPos pos = ((BlockRayTraceResult)result).getPos();
             Direction d = ((BlockRayTraceResult)result).getFace();
             ItemStack stack = this.getDataManager().get(ITEMSTACK_DATA);
-            Inventula.LOGGER.log(Level.DEBUG, "Dispenser Entity hit block at ({}, {}, {}) on face {}",
-                    pos.getX(), pos.getY(), pos.getZ(), d.getName());
             killEntity(SuperDispenserBehaviour.evaluateEffect(stack, world, pos, d));
         } else if (result.getType() == RayTraceResult.Type.ENTITY) {
             // TODO
@@ -127,7 +125,7 @@ public class DispenserItemEntity extends ProjectileItemEntity {
     @Override
     public IPacket<?> createSpawnPacket () {
         return PacketHandler.INSTANCE.toVanillaPacket(new DispenserEntitySpawnMessage(this.getDataManager().get(ITEMSTACK_DATA),
-                initialPos, initialVel, 10, getEntityId()), NetworkDirection.PLAY_TO_CLIENT);
+                initialPos, initialVel, 1000, getEntityId()), NetworkDirection.PLAY_TO_CLIENT);
     }
 
     @Override

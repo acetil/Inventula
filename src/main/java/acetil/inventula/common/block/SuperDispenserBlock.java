@@ -115,7 +115,6 @@ public class SuperDispenserBlock extends Block {
     @SuppressWarnings("deprecation")
     @Override
     public void onReplaced (BlockState state, World worldIn, BlockPos pos, BlockState newState, boolean isMoving) {
-        System.out.println("On replaced!");
         if (state.hasTileEntity() && state.getBlock() != newState.getBlock()) {
             IItemHandler handler = worldIn.getTileEntity(pos)
                     .getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY)

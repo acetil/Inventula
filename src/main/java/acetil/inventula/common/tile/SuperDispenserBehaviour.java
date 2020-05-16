@@ -57,7 +57,6 @@ public class SuperDispenserBehaviour {
         return evaluateBehaviours(new Behaviour.QuadArg<>(stack, world, pos, direction), effectBehaviours, true);
     }
     public static ItemStack evaluateEffectFluid (ItemStack stack, World world, BlockPos pos, Direction direction) {
-        Inventula.LOGGER.log(Level.DEBUG, "Evaluting fluid effects!");
         return evaluateBehaviours(new Behaviour.QuadArg<>(stack, world, pos, direction), fluidBehaviours, true);
     }
     public static ItemStack evaluateEntity (ItemStack stack, Entity entity, Direction direction) {

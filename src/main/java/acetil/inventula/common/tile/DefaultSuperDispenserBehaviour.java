@@ -292,7 +292,6 @@ public class DefaultSuperDispenserBehaviour {
         Inventula.LOGGER.log(Level.INFO, "Adding default effect dispenser behaviours!");
         SuperDispenserBehaviour.registerEffect((ItemStack stack) -> stack.getItem() instanceof BlockItem, DESTROY,
                 (ItemStack stack, World world, BlockPos pos, Direction d) -> {
-            Inventula.LOGGER.log(Level.DEBUG, "Attempting to add block!");
             BlockPos newPos = pos.add(d.getDirectionVec());
             BlockItem item = (BlockItem) stack.getItem();
             ActionResultType result = item.tryPlace(new CustomBlockItemUseContext(world, stack, pos, d));

@@ -30,7 +30,6 @@ public class CrafterMaskChangeMessage {
     }
     public void handlePacket (Supplier<NetworkEvent.Context> ctx) {
         ctx.get().enqueueWork(() -> {
-            System.out.println("Updating mask!");
             TileEntity te = Minecraft.getInstance().world.getTileEntity(pos);
             if (te instanceof CraftingDropperTile) {
                 ((CraftingDropperTile) te).updateMask(slot, mask);

@@ -25,7 +25,6 @@ public class DispenserItemRenderer extends EntityRenderer<DispenserItemEntity> {
     public void render (DispenserItemEntity entityIn, float entityYaw, float partialTicks, MatrixStack matrixStackIn,
                         IRenderTypeBuffer bufferIn, int packedLightIn) {
         // mostly copied from ItemRenderer
-        System.out.println("Rendering dispenser item!");
         matrixStackIn.push();
         ItemStack stack = entityIn.getItem();
         IBakedModel model = itemRenderer.getItemModelWithOverrides(stack, entityIn.world, null);

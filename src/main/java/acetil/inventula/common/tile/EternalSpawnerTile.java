@@ -91,7 +91,6 @@ public class EternalSpawnerTile extends TileEntity implements ITickableTileEntit
         if (activated != spawner.isActivated() && !world.isRemote()) {
             PacketHandler.INSTANCE.send(PacketDistributor.TRACKING_CHUNK.with(() -> world.getChunkAt(pos)),
                     new SpawnerChangeActivationMessage(pos, activated));
-            Inventula.LOGGER.log(Level.DEBUG, "Sent message");
         }
         spawner.setIsActivated(activated);
     }

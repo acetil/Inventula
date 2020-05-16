@@ -33,7 +33,6 @@ public class DispenserItemParticle extends Particle {
         this.stack = data.getStack();
         this.itemRenderer = Minecraft.getInstance().getItemRenderer();
         this.setMaxAge(data.getLifetime());
-        System.out.println("Making particle!");
         entityId = data.getEntityId();
         WorldParticleTracker.addParticle(this);
     }
