@@ -1,6 +1,7 @@
 package acetil.inventula.common.tile;
 
 import acetil.inventula.common.Inventula;
+import acetil.inventula.common.constants.ConfigConstants;
 import acetil.inventula.common.entity.DispenserItemEntity;
 import acetil.inventula.common.util.QuadConsumer;
 import acetil.inventula.common.util.QuadFunction;
@@ -107,7 +108,7 @@ public class DefaultSuperDispenserBehaviour {
                 // TODO: deal with case when block in front of dispenser
                 Inventula.LOGGER.log(Level.DEBUG, "Spawning dispenser entity at {}!", System.currentTimeMillis());
                 Vec3i vec1 = d.getDirectionVec();
-                Vec3d velVec = new Vec3d(vec1).scale(DISPENSER_ENTITY_VELOCITY);
+                Vec3d velVec = new Vec3d(vec1).scale(ConfigConstants.SERVER.INITIAL_DISPENSER_ENTITY_SPEED.get());
                 Vec3d offVec = getOffsetSpawnVec(pos, d);
                 /*PacketHandler.INSTANCE.send(PacketDistributor.TRACKING_CHUNK.with(() -> world.getChunkAt(pos)),
                         new DispenserEntitySpawnMessage(stack.copy().split(1), offVec, velVec, 10));*/
@@ -329,7 +330,7 @@ public class DefaultSuperDispenserBehaviour {
         });
         SuperDispenserBehaviour.registerEffect(MATCH_NOT_EMPTY, DESTROY, (ItemStack stack, World world, BlockPos pos, Direction d) -> {
             TileEntity te = world.getTileEntity(pos);
-            if (te == null) {
+            if (te == null || !ConfigConstants.SERVER.ALLOW_ITEM_HANDLER_DISPENSER.get()) {
                 return false;
             }
             LazyOptional<IItemHandler> itemHandlerOptional = te.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, d);

@@ -3,6 +3,7 @@ package acetil.inventula.common;
 import acetil.inventula.client.ClientEvents;
 import acetil.inventula.client.ClientSetup;
 import acetil.inventula.common.block.ModBlocks;
+import acetil.inventula.common.constants.ConfigConstants;
 import acetil.inventula.common.constants.Constants;
 import acetil.inventula.common.containers.ModContainers;
 import acetil.inventula.common.entity.ModEntities;
@@ -11,7 +12,9 @@ import acetil.inventula.common.network.PacketHandler;
 import acetil.inventula.common.particle.ModParticles;
 import acetil.inventula.common.tile.DefaultSuperDispenserBehaviour;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.InterModEnqueueEvent;
@@ -39,6 +42,8 @@ public class Inventula {
         // Register ourselves for server and other game events we are interested in
         MinecraftForge.EVENT_BUS.register(this);
         registerDefferedRegisters();
+        ConfigConstants.Server.bakeConfigs();
+        ModLoadingContext.get().registerConfig(ModConfig.Type.SERVER, ConfigConstants.SERVER_SPEC);
     }
 
     private void setup (final FMLCommonSetupEvent event) {
