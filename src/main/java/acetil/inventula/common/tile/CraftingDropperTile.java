@@ -4,6 +4,7 @@ import acetil.inventula.common.Inventula;
 import acetil.inventula.common.block.CraftingDropperBlock;
 import acetil.inventula.common.block.ModBlocks;
 import acetil.inventula.common.network.CrafterItemSlotChangeMessage;
+import acetil.inventula.common.network.CrafterMaskChangeMessage;
 import acetil.inventula.common.network.PacketHandler;
 import acetil.inventula.common.util.VecHelp;
 import com.sun.javafx.geom.Vec2d;
@@ -162,6 +163,8 @@ public class CraftingDropperTile extends TileEntity {
             maskedSlots[slot] = true;
             Inventula.LOGGER.log(Level.DEBUG, "Masked slot {}", slot);
         }
+        PacketHandler.INSTANCE.send(PacketDistributor.TRACKING_CHUNK.with(() -> world.getChunkAt(pos)),
+                new CrafterMaskChangeMessage(slot, maskedSlots[slot], pos));
     }
     public void setDirection () {
         this.direction = world.getBlockState(pos).get(CraftingDropperBlock.FACING);
@@ -191,6 +194,12 @@ public class CraftingDropperTile extends TileEntity {
         compound.putByteArray("masked", getMaskedSlots());
         return compound;
     }
+    public boolean isSlotMasked (int slot) {
+        return maskedSlots[slot];
+    }
+    public void updateMask (int slot, boolean mask) {
+        maskedSlots[slot] = mask;
+    }
     private byte[] getMaskedSlots () {
         byte[] bytes = new byte[9];
         for (int i = 0; i < maskedSlots.length; i++) {
@@ -200,7 +209,10 @@ public class CraftingDropperTile extends TileEntity {
     }
     private void setMaskedSlots (byte[] bytes) {
         for (int i = 0; i < bytes.length; i++) {
-            maskedSlots[i] = bytes[0] > 0;
+            maskedSlots[i] = bytes[i] > 0;
+            if (maskedSlots[i]) {
+                maskedHandler.addMaskedSlot(i);
+            }
         }
     }
     @Nonnull

@@ -11,6 +11,7 @@ import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.client.renderer.tileentity.TileEntityRenderer;
 import net.minecraft.client.renderer.tileentity.TileEntityRendererDispatcher;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
@@ -22,13 +23,15 @@ import net.minecraftforge.items.IItemHandler;
 
 public class CraftingDropperRenderer extends TileEntityRenderer<CraftingDropperTile> {
     // TODO: make logic smarter
-    public CraftingDropperRenderer (TileEntityRendererDispatcher rendererDispatcherIn) {
-        super(rendererDispatcherIn);
-    }
     private static final float ITEM_SCALE = (float)4/16;
     private static final float INITIAL_TRANSLATE = (float) 12/ 16;
     private static final float INITAL_OUTWARD = (float) 1/16;
     private static final float SLOT_OVER = (float) 20/16;
+    private final ItemStack MASK_STACK;
+    public CraftingDropperRenderer (TileEntityRendererDispatcher rendererDispatcherIn) {
+        super(rendererDispatcherIn);
+        MASK_STACK = new ItemStack(Items.BARRIER);
+    }
     @Override
     public void render (CraftingDropperTile tileEntity, float partialTicks, MatrixStack matrixStackIn,
                         IRenderTypeBuffer bufferIn, int combinedLightIn, int combinedOverlayIn) {
@@ -47,11 +50,19 @@ public class CraftingDropperRenderer extends TileEntityRenderer<CraftingDropperT
         if (handlerOp.isPresent()) {
             IItemHandler handler = handlerOp.orElseGet(null);
             for (int i = 0; i < handler.getSlots(); i++) {
+                // TODO: cleanup
                 if (handler.getStackInSlot(i) != ItemStack.EMPTY) {
                     matrixStackIn.push();
                     getRelativePosition(matrixStackIn, xVec, yVec, i);
                     matrixStackIn.rotate(quaternion);
                     renderItem(handler.getStackInSlot(i), tileEntity.getWorld(),renderer, matrixStackIn, bufferIn,
+                            LightTexture.packLight(blockLight, skyLight), combinedOverlayIn);
+                    matrixStackIn.pop();
+                } else if (tileEntity.isSlotMasked(i)) {
+                    matrixStackIn.push();
+                    getRelativePosition(matrixStackIn, xVec, yVec, i);
+                    matrixStackIn.rotate(quaternion);
+                    renderItem(MASK_STACK, tileEntity.getWorld(),renderer, matrixStackIn, bufferIn,
                             LightTexture.packLight(blockLight, skyLight), combinedOverlayIn);
                     matrixStackIn.pop();
                 }

@@ -19,5 +19,7 @@ public class PacketHandler {
                 SpawnerChangeActivationMessage::new, SpawnerChangeActivationMessage::handlePacket);
         INSTANCE.registerMessage(id++, CrafterItemSlotChangeMessage.class, CrafterItemSlotChangeMessage::writePacket,
                 CrafterItemSlotChangeMessage::new, CrafterItemSlotChangeMessage::handleMessage);
+        INSTANCE.registerMessage(id++, CrafterMaskChangeMessage.class, CrafterMaskChangeMessage::writePacket,
+                CrafterMaskChangeMessage::new, CrafterMaskChangeMessage::handlePacket);
     }
 }
