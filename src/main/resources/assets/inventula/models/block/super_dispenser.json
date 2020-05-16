@@ -2,7 +2,7 @@
   "parent" : "block/block",
   "textures" : {
     "particle" : "inventula:block/super_dispenser_front",
-    "back" : "minecraft:block/furnace_back",
+    "back" : "minecraft:block/furnace_top",
     "front" : "inventula:block/super_dispenser_front",
     "side" : "inventula:block/super_dispenser_side"
   },"elements" : [
