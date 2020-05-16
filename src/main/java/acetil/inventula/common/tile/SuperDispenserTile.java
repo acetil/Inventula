@@ -1,6 +1,7 @@
 package acetil.inventula.common.tile;
 
 import acetil.inventula.common.block.ModBlocks;
+import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Direction;
@@ -55,7 +56,12 @@ public class SuperDispenserTile extends TileEntity {
         return super.write(compound);
     }
     private int getDispenseSlot () {
-        return 0; // TODO
+        for (int i = 0; i < itemHandler.getSlots(); i++) {
+            if (itemHandler.getStackInSlot(i) != ItemStack.EMPTY) {
+                return i;
+            }
+        }
+        return 0;
     }
 
     public void dispense (Direction direction) {
