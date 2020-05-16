@@ -1,0 +1,18 @@
+{
+  "type" : "minecraft:crafting_shapeless",
+  "ingredients" : [
+    {
+      "item" : "minecraft:ender_eye"
+    },
+    {
+      "item" : "minecraft:popped_chorus_fruit"
+    },
+    {
+      "tag" : "forge:dusts/redstone"
+    }
+  ],
+  "result" : {
+    "item" : "inventula:eternal_eye",
+    "count" : 1
+  }
+}

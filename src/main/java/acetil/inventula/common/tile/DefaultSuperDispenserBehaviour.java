@@ -350,7 +350,6 @@ public class DefaultSuperDispenserBehaviour {
             }
             LazyOptional<IItemHandler> itemHandlerOptional = te.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, d);
             if (itemHandlerOptional.isPresent()) {
-                Inventula.LOGGER.log(Level.DEBUG, "Has item handler!");
                 IItemHandler itemHandler = itemHandlerOptional.orElse(null);
                 ItemStack stack1 = stack.copy();
                 int i = 0;
