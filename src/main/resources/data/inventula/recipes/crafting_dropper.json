@@ -1,0 +1,23 @@
+{
+  "type" : "minecraft:crafting_shaped",
+  "pattern" : [
+    "x  ",
+    "a  ",
+    "b  "
+  ],
+  "key" : {
+    "x" : {
+      "item" : "minecraft:dropper"
+    },
+    "a" : {
+      "item" : "minecraft:crafting_table"
+    },
+    "b" : {
+      "tag" : "forge:dusts/redstone"
+    }
+  },
+  "result" : {
+    "item" : "inventula:crafting_dropper",
+    "count" : 1
+  }
+}

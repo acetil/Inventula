@@ -29,7 +29,7 @@ displayName="Inventula" #mandatory
 authors="acetil" #optional
 # The description text for the mod (multi line!) (#mandatory)
 description='''
-A Vanilla+ mod which adds a super dispenser which can be used for automation, as well as an item that turns spawners on regardless of player proximity.
+A Vanilla+ mod which adds some blocks which can be used for automation, as well as an item that turns spawners on regardless of player proximity.
 '''
 # A dependency - use the . to indicate dependency for a specific modid. Dependencies are optional.
 [[dependencies.modjam]] #optional

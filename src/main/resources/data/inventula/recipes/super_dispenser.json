@@ -1,0 +1,26 @@
+{
+  "type" : "minecraft:crafting_shaped",
+  "pattern" : [
+    " x ",
+    "abc",
+    " x "
+  ],
+  "key" : {
+    "x" : {
+      "tag" : "forge:gems/quartz"
+    },
+    "a" : {
+      "item" : "minecraft:dispenser"
+    },
+    "b" : {
+      "item" : "minecraft:sticky_piston"
+    },
+    "c" : {
+      "tag" : "forge:dusts/redstone"
+    }
+  },
+  "result" : {
+    "item" : "inventula:super_dispenser",
+    "count" : 1
+  }
+}

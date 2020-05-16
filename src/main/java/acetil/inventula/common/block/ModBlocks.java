@@ -6,10 +6,12 @@ import acetil.inventula.common.tile.CraftingDropperTile;
 import acetil.inventula.common.tile.EternalSpawnerTile;
 import acetil.inventula.common.tile.SuperDispenserTile;
 import net.minecraft.block.Block;
+import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
 import net.minecraft.tileentity.TileEntityType;
+import net.minecraftforge.common.ToolType;
 import net.minecraftforge.fml.RegistryObject;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
@@ -20,11 +22,11 @@ public class ModBlocks {
     public static DeferredRegister<TileEntityType<?>> TILE_ENTITIES = new DeferredRegister<>(ForgeRegistries.TILE_ENTITIES, Constants.MODID);
 
     public static RegistryObject<Block> SUPER_DISPENSER = BLOCKS.register("super_dispenser",
-            () -> new SuperDispenserBlock(Block.Properties.create(Material.ROCK)));
+            () -> new SuperDispenserBlock(Block.Properties.create(Material.ROCK).hardnessAndResistance(3.5f)));
     public static RegistryObject<Block> ETERNAL_SPAWNER = BLOCKS.register("eternal_spawner",
-            () -> new EternalSpawnerBlock(Block.Properties.create(Material.ROCK).notSolid().variableOpacity()));
+            () -> new EternalSpawnerBlock(Block.Properties.create(Material.ROCK).notSolid().variableOpacity().hardnessAndResistance(5.0f).harvestTool(ToolType.PICKAXE).sound(SoundType.METAL)));
     public static RegistryObject<Block> CRAFTING_DROPPER = BLOCKS.register("crafting_dropper",
-            () -> new CraftingDropperBlock(Block.Properties.create(Material.ROCK).notSolid().variableOpacity()));
+            () -> new CraftingDropperBlock(Block.Properties.create(Material.ROCK).notSolid().variableOpacity().hardnessAndResistance(3.5f)));
 
     private static RegistryObject<Item> SUPER_DISPENSER_ITEM = ITEMS.register("super_dispenser",
             () -> new BlockItem(SUPER_DISPENSER.get(), new Item.Properties().group(Inventula.CUSTOM_ITEM_GROUP)));
