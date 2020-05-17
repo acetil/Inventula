@@ -57,7 +57,7 @@ public class SuperDispenserTile extends TileEntity {
     }
     private int getDispenseSlot () {
         for (int i = 0; i < itemHandler.getSlots(); i++) {
-            if (itemHandler.getStackInSlot(i) != ItemStack.EMPTY) {
+            if (!itemHandler.getStackInSlot(i).isEmpty()) {
                 return i;
             }
         }

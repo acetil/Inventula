@@ -157,18 +157,15 @@ public class CraftingDropperTile extends TileEntity {
         if (maskedSlots[slot]) {
             maskedHandler.removeMaskedSlot(slot);
             maskedSlots[slot] = false;
-            Inventula.LOGGER.log(Level.DEBUG, "Unmasked slot {}", slot);
         } else {
             maskedHandler.addMaskedSlot(slot);
             maskedSlots[slot] = true;
-            Inventula.LOGGER.log(Level.DEBUG, "Masked slot {}", slot);
         }
         PacketHandler.INSTANCE.send(PacketDistributor.TRACKING_CHUNK.with(() -> world.getChunkAt(pos)),
                 new CrafterMaskChangeMessage(slot, maskedSlots[slot], pos));
     }
     public void setDirection () {
         this.direction = world.getBlockState(pos).get(CraftingDropperBlock.FACING);
-        System.out.println("Set direction! Direction: " + direction);
     }
     public Direction getDirection () {
         if (!gotDirection) {

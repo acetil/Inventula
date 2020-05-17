@@ -90,11 +90,8 @@ public class DefaultSuperDispenserBehaviour {
     };
     private static final QuadFunction<ItemStack, World, BlockPos, Direction, Boolean> FLUID_BEHAVIOUR =
             (ItemStack stack, World world, BlockPos pos, Direction d) -> {
-        Inventula.LOGGER.log(Level.DEBUG, "Attempting to pick up fluid!");
         BlockState state = world.getBlockState(pos);
-        Inventula.LOGGER.log(Level.DEBUG, "Block: {}", state.getBlock().getRegistryName().toString());
         if (state.getBlock() instanceof IBucketPickupHandler) {
-            Inventula.LOGGER.log(Level.DEBUG, "Bucket pickup handler!");
             Fluid fluid = ((IBucketPickupHandler) state.getBlock()).pickupFluid(world, pos, state);
             if (fluid != Fluids.EMPTY) {
                 world.addEntity(new ItemEntity(world, pos.getX(), pos.getY(), pos.getZ(), new ItemStack(fluid.getFilledBucket())));
@@ -106,7 +103,6 @@ public class DefaultSuperDispenserBehaviour {
     public static final QuadFunction<ItemStack, World, BlockPos, Direction, Boolean> SPAWN_DISPENSER_ENTITY =
             (ItemStack stack, World world, BlockPos pos, Direction d) -> {
                 // TODO: deal with case when block in front of dispenser
-                Inventula.LOGGER.log(Level.DEBUG, "Spawning dispenser entity at {}!", System.currentTimeMillis());
                 Vec3i vec1 = d.getDirectionVec();
                 Vec3d velVec = new Vec3d(vec1).scale(ConfigConstants.SERVER.INITIAL_DISPENSER_ENTITY_SPEED.get());
                 Vec3d offVec = getOffsetSpawnVec(pos, d);
@@ -123,7 +119,6 @@ public class DefaultSuperDispenserBehaviour {
                 (ItemStack stack, World world, BlockPos pos, Direction direction) -> true);
         SuperDispenserBehaviour.registerInitial(MATCH_NOT_EMPTY, ITEM_STACK_SHRINK,
                 (ItemStack stack, World world, BlockPos pos, Direction direction) -> {
-            Inventula.LOGGER.log(Level.DEBUG, "Dispensed item in direction: " + direction.getName());
             Vec3i vec1 = direction.getDirectionVec();
             Vec3d spawnVec = getOffsetSpawnVec(pos, direction);
             ItemEntity entity = new ItemEntity(world, spawnVec.getX(),spawnVec.getY(),
