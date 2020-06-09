@@ -115,4 +115,31 @@ public class CraftingDropperBlock extends Block {
         }
         super.onReplaced(state, worldIn, pos, newState, isMoving);
     }
+
+    @SuppressWarnings("deprecation")
+    @Override
+    public boolean hasComparatorInputOverride (BlockState state) {
+        return true;
+    }
+
+    @SuppressWarnings("deprecation")
+    @Override
+    public int getComparatorInputOverride (BlockState blockState, World worldIn, BlockPos pos) {
+        TileEntity te = worldIn.getTileEntity(pos);
+        if (te instanceof CraftingDropperTile) {
+            IItemHandler handler = te.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null).orElse(null);
+            int filledSlots = 0;
+            int totalSlots = 0;
+            for (int i = 0; i < handler.getSlots(); i++) {
+                if (!handler.getStackInSlot(i).isEmpty()) {
+                    filledSlots++;
+                }
+                if (!((CraftingDropperTile) te).isSlotMasked(i)) {
+                    totalSlots++;
+                }
+            }
+            return (int)Math.floor((double)filledSlots / totalSlots * 15);
+        }
+        return super.getComparatorInputOverride(blockState, worldIn, pos);
+    }
 }

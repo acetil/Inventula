@@ -27,6 +27,7 @@ public class SuperDispenserTile extends TileEntity {
             protected void onContentsChanged (int slot) {
                 super.onContentsChanged(slot);
                 SuperDispenserTile.this.markDirty();
+                world.updateComparatorOutputLevel(pos, world.getBlockState(pos).getBlock());
             }
         };
         itemOptional = LazyOptional.of(() -> itemHandler);

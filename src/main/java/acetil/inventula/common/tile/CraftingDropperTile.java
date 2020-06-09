@@ -66,6 +66,7 @@ public class CraftingDropperTile extends TileEntity {
                     PacketHandler.INSTANCE.send(PacketDistributor.TRACKING_CHUNK.with(() -> world.getChunkAt(pos)),
                             new CrafterItemSlotChangeMessage(slot, getStackInSlot(slot), pos));
                 }
+                world.updateComparatorOutputLevel(pos, world.getBlockState(pos).getBlock());
             }
         };
         maskedHandler = new MaskedItemHandler(itemHandler);

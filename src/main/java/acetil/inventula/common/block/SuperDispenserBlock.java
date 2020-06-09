@@ -33,6 +33,7 @@ import net.minecraft.world.World;
 import net.minecraftforge.fml.network.NetworkHooks;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
+import net.minecraftforge.items.wrapper.InvWrapper;
 import org.apache.logging.log4j.Level;
 
 import javax.annotation.Nullable;
@@ -131,5 +132,32 @@ public class SuperDispenserBlock extends Block {
             worldIn.updateComparatorOutputLevel(pos, this);
         }
         super.onReplaced(state, worldIn, pos, newState, isMoving);
+    }
+
+    @SuppressWarnings("deprecation")
+    @Override
+    public boolean hasComparatorInputOverride (BlockState state) {
+        return true;
+    }
+
+    @SuppressWarnings("deprecation")
+    @Override
+    public int getComparatorInputOverride (BlockState blockState, World worldIn, BlockPos pos) {
+        TileEntity te = worldIn.getTileEntity(pos);
+        if (te != null && te.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY).isPresent()) {
+            // Adapted from Container.calcRedstoneFromInventory
+            int numItems = 0;
+            double totalFraction = 0.0;
+            IItemHandler itemHandler = te.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY).orElse(null);
+            for (int i = 0; i < itemHandler.getSlots(); i++) {
+                ItemStack stack = itemHandler.getStackInSlot(i);
+                if (!stack.isEmpty()) {
+                    totalFraction += (double)stack.getCount() / Math.min(itemHandler.getSlotLimit(i), stack.getMaxStackSize());
+                    numItems++;
+                }
+            }
+            return Math.floor(totalFraction / itemHandler.getSlots() * 14.0) + numItems > 0 ? 1 : 0;
+        }
+        return super.getComparatorInputOverride(blockState, worldIn, pos);
     }
 }
